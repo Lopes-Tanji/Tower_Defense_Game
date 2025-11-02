@@ -73,6 +73,13 @@
 
             <Separator Margin="0,12,0,12"/>
 
+            <!-- Text zum testen des GameLoops und der Tickrate -->
+            <TextBlock Text="Zeit: " Foreground="Gainsboro"/>
+            <!-- Sekunden auf 1 Nachkommastelle formatieren -->
+            <TextBlock Text="{Binding ElapsedSeconds, StringFormat={}{0:F1} s}" Foreground="LightBlue"/>
+            <TextBlock Text="Frames: " Foreground="Gainsboro"/>
+            <TextBlock Text="{Binding FrameCount}" Foreground="LightBlue"/>
+
             <!-- Hier kommen später Buttons für Türme & Waves -->
             <TextBlock Text="(Weitere Buttons/Türme kommen später)"
                        Foreground="#aaa" TextWrapping="Wrap"/>

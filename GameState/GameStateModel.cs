@@ -42,6 +42,42 @@ namespace Tower_Defense_Game.GameState
         // Sammlung von Punkten, die WPF als Linienzug zeichnen kann
         public PointCollection PathPoints { get; }
 
+
+        // Speichert, wie viele Sekunden das Spiel bereits gelaufen ist.
+        // Der Wert wird im Update()-Loop pro Tick erhöht.
+        private double _elapsedSeconds;
+
+        // Öffentliche Property, damit die UI (XAML) den Wert anzeigen kann.
+        // Der "private set" verhindert, dass anderer Code diesen Wert verändern kann.
+        public double ElapsedSeconds
+        {
+            // get => gibt den aktuellen Wert zurück (für UI-Binding)
+            get => _elapsedSeconds;
+
+            // private set => nur diese Klasse darf den Wert verändern
+            // Wenn der Wert geändert wird, ruft OnPropertyChanged() die UI dazu auf,
+            // die Anzeige zu aktualisieren.
+            private set { _elapsedSeconds = value; OnPropertyChanged(); }
+        }
+
+        // Zählt, wie viele "Ticks" (Frames / Updates) bisher vergangen sind.
+        // Wir nutzen long, weil diese Zahl im Laufe der Zeit sehr groß wird.
+        private double _frameCount;
+        // Öffentliche Property, damit die UI die Frameanzahl anzeigen kann.
+        // Wird ähnlich wie oben aktualisiert.
+        public double FrameCount
+        {
+            // Gibt den bisherigen Frame-Zähler an die UI zurück
+            get => _frameCount;
+            // Nur intern setzbar – UI soll nicht Werte verändern können!
+            private set { _frameCount = value; OnPropertyChanged(); }
+        }
+
+        // GameLoop ist der "Motor" des Spiels.
+        // Er ruft regelmäßig (z.B. 30x pro Sekunde) Update(dt) auf.
+        // readonly bedeutet: einmal beim Erstellen gesetzt → kann später nicht ersetzt werden.
+        private readonly GameLoop _loop;
+
         public GameStateModel()
         {
             // Hole Beispielpfad
@@ -54,10 +90,29 @@ namespace Tower_Defense_Game.GameState
                 pc.Add(new System.Windows.Point(p.X, p.Y));
 
             PathPoints = pc; // Jetzt kann XAML darauf binden
+
+            // GameLoop erstellen: ruft untenstehendes Update(dt) auf
+            _loop = new GameLoop(Update, fps: 30);
+            _loop.Start();
         }
 
-        // Dieses Event gehört zum INotifyPropertyChanged-Interface.
-        // Es sorgt dafür, dass WPF erkennt, wenn sich ein Wert geändert hat.
+        // Diese Methode wird vom GameLoop aufgerufen (dt = vergangene Sekunden seit letztem Tick)
+        private void Update(double deltaTickTime)
+        {
+            // Beweis dass es tickt: Zeit und Framezahl hochzählen
+            ElapsedSeconds += deltaTickTime;
+            FrameCount++;
+
+            // HIER kommt die eigentliche Spiellogik hin:
+            // - Gegner updaten
+            // - Türme updaten
+            // - Projektile updaten
+            // - Kollisions- / Treffer-Checks
+            // - Aufräumen (tote Gegner/Projektile entfernen)
+        }
+
+            // Dieses Event gehört zum INotifyPropertyChanged-Interface.
+            // Es sorgt dafür, dass WPF erkennt, wenn sich ein Wert geändert hat.
         public event PropertyChangedEventHandler? PropertyChanged;
 
         // Ruft PropertyChanged aus, ohne den Namen manuell schreiben zu müssen.
