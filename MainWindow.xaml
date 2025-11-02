@@ -5,8 +5,77 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Tower_Defense_Game"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Tower Defense" Height="720" Width="1100"
+        Background="#202225">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <!-- Linke Seite: Spielfeld -->
+            <ColumnDefinition/>
+            <!-- Rechte Seite: HUD / Menü -->
+            <ColumnDefinition Width="260"/>
+        </Grid.ColumnDefinitions>
 
+        <!-- Spielfeld -->
+        <Canvas x:Name="GameCanvas" Background="#2b2f33" Margin="12">
+
+            <!-- Sichtbarer Weg: weiße Linie + breite "Straße" darunter -->
+            <!-- Breite graue Straße -->
+            <Polyline Points="{Binding PathPoints}"
+              Stroke="#404040" StrokeThickness="24"
+              StrokeLineJoin="Round"/>
+
+            <!-- Weiße gestrichelte Mittellinie -->
+            <Polyline Points="{Binding PathPoints}"
+              Stroke="White" StrokeThickness="3"
+              StrokeDashArray="2 3"
+              StrokeLineJoin="Round"/>
+            <!--    Wegpunkte anzeigen, hilft beim Debuggen -->
+            
+            <ItemsControl ItemsSource="{Binding PathPoints}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate><Canvas/></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Left" Value="{Binding X}"/>
+                        <Setter Property="Canvas.Top"  Value="{Binding Y}"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Ellipse Width="8" Height="8" Fill="Orange"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            
+
+        </Canvas>
+
+        <!-- HUD rechts -->
+        <StackPanel Grid.Column="1" Background="#1e1e1e">
+
+            <!-- Überschrift -->
+            <TextBlock Text="Tower Defense" FontSize="20" Foreground="White" Margin="0,0,0,12"/>
+
+            <!-- Anzeige Lives -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <TextBlock Text="Lives: " Foreground="Gainsboro"/>
+                <!-- Binding: Text zeigt Wert aus GameViewModel.Lives an -->
+                <TextBlock Text="{Binding Lives}" Foreground="LightGreen" FontWeight="SemiBold"/>
+            </StackPanel>
+
+            <!-- Anzeige Gold -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                <TextBlock Text="Gold: " Foreground="Gainsboro"/>
+                <!-- Binding: Text zeigt Wert aus GameViewModel.Gold an -->
+                <TextBlock Text="{Binding Gold}" Foreground="Gold" FontWeight="SemiBold"/>
+            </StackPanel>
+
+            <Separator Margin="0,12,0,12"/>
+
+            <!-- Hier kommen später Buttons für Türme & Waves -->
+            <TextBlock Text="(Weitere Buttons/Türme kommen später)"
+                       Foreground="#aaa" TextWrapping="Wrap"/>
+        </StackPanel>
     </Grid>
 </Window>
