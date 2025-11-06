@@ -44,6 +44,7 @@ namespace Tower_Defense_Game.GameState
         public PointCollection PathPoints { get; }
 
         // Gegner-Liste für die UI
+        //ObservableCollection<Enemy> Enemies war zu beginn List<Enemy> jedoch ist das Spiel gecrasht wenn der Test-Enemy gelöscht wurde.
         public ObservableCollection<Enemy> Enemies { get; } = new();
 
         // Speichert, wie viele Sekunden das Spiel bereits gelaufen ist.
@@ -99,7 +100,7 @@ namespace Tower_Defense_Game.GameState
             _loop.Start();
 
             // Test-Enemy erstellt
-            Enemies.Add(new Enemy(GamePath, 100, 80));
+            Enemies.Add(new Enemy(GamePath, 100, 80, 30));
         }
 
         // Diese Methode wird vom GameLoop aufgerufen (deltaTickTime = vergangene Sekunden seit letztem Tick)
@@ -112,19 +113,25 @@ namespace Tower_Defense_Game.GameState
             // HIER kommt die eigentliche Spiellogik hin:
 
             // - Gegner updaten
-            foreach(var enemy in Enemies.ToList())
+            // .ToList() damit nicht ObservableCollection<Enemy> direkt verändert wird somit crasht es nicht.
+            foreach (var enemy in Enemies.ToList())
             {
+                // Update Methode in Enemy.cs wird ausgeführt und somit die neue position von Enemy gesetzt
                 enemy.Update(deltaTickTime);
 
+                // Wenn der Gegner das ende erreicht dann wird ein Leben abgezogen und der Enemy verschwindet
                 if(enemy.ReachedEnd)
                 {
                     Lives--;
                     Enemies.Remove(enemy);
                     continue;
                 }
+                // Wenn der Gegner stirbt wird Bounty dem Gold hinzugefügt und enemy Verschwindet
                 if(enemy.IsDead)
                 {
                     Gold += enemy.Bounty;
+                    Enemies.Remove(enemy);
+                    continue;
                 }
 
             }

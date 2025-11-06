@@ -55,11 +55,12 @@ namespace Tower_Defense_Game.GameObjekt
         public bool ReachedEnd => _distanceOnPath >= _path.TotalLength;
 
         //Konstruktor Enemy
-        public Enemy(GOPath path, double hp, double speed)
+        public Enemy(GOPath path, double hp, double speed, int bounty)
         {
             this._path = path;
             this.HP = MaxHP = hp; // Gegner starten mit 100% Leben deswegen ist HP und MaxHP am anfang gleich
             this.Speed = speed;
+            this.Bounty = bounty;
 
             var (x, y) = _path.PositionAt(0); // X und Y Koordinaten werden vom startpunkt von GOPath ausgelesen 
 
