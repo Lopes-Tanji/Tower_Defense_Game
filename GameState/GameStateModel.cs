@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -42,6 +43,8 @@ namespace Tower_Defense_Game.GameState
         // Sammlung von Punkten, die WPF als Linienzug zeichnen kann
         public PointCollection PathPoints { get; }
 
+        // Gegner-Liste für die UI
+        public ObservableCollection<Enemy> Enemies { get; } = new();
 
         // Speichert, wie viele Sekunden das Spiel bereits gelaufen ist.
         // Der Wert wird im Update()-Loop pro Tick erhöht.
@@ -74,7 +77,7 @@ namespace Tower_Defense_Game.GameState
         }
 
         // GameLoop ist der "Motor" des Spiels.
-        // Er ruft regelmäßig (z.B. 30x pro Sekunde) Update(dt) auf.
+        // Er ruft regelmäßig (z.B. 30x pro Sekunde) Update(deltaTickTime) auf.
         // readonly bedeutet: einmal beim Erstellen gesetzt → kann später nicht ersetzt werden.
         private readonly GameLoop _loop;
 
@@ -91,12 +94,15 @@ namespace Tower_Defense_Game.GameState
 
             PathPoints = pc; // Jetzt kann XAML darauf binden
 
-            // GameLoop erstellen: ruft untenstehendes Update(dt) auf
+            // GameLoop erstellen: ruft untenstehendes Update(deltaTickTime) auf
             _loop = new GameLoop(Update, fps: 30);
             _loop.Start();
+
+            // Test-Enemy erstellt
+            Enemies.Add(new Enemy(GamePath, 100, 80));
         }
 
-        // Diese Methode wird vom GameLoop aufgerufen (dt = vergangene Sekunden seit letztem Tick)
+        // Diese Methode wird vom GameLoop aufgerufen (deltaTickTime = vergangene Sekunden seit letztem Tick)
         private void Update(double deltaTickTime)
         {
             // Beweis dass es tickt: Zeit und Framezahl hochzählen
@@ -104,7 +110,25 @@ namespace Tower_Defense_Game.GameState
             FrameCount++;
 
             // HIER kommt die eigentliche Spiellogik hin:
+
             // - Gegner updaten
+            foreach(var enemy in Enemies.ToList())
+            {
+                enemy.Update(deltaTickTime);
+
+                if(enemy.ReachedEnd)
+                {
+                    Lives--;
+                    Enemies.Remove(enemy);
+                    continue;
+                }
+                if(enemy.IsDead)
+                {
+                    Gold += enemy.Bounty;
+                }
+
+            }
+
             // - Türme updaten
             // - Projektile updaten
             // - Kollisions- / Treffer-Checks

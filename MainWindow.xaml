@@ -26,7 +26,7 @@
 
             <!-- Weiße gestrichelte Mittellinie -->
             <Polyline Points="{Binding PathPoints}"
-              Stroke="White" StrokeThickness="3"
+              Stroke="White" StrokeThickness="2"
               StrokeDashArray="2 3"
               StrokeLineJoin="Round"/>
             <!--    Wegpunkte anzeigen, hilft beim Debuggen -->
@@ -43,10 +43,32 @@
                 </ItemsControl.ItemContainerStyle>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Ellipse Width="8" Height="8" Fill="Orange"/>
+                        <Ellipse Width="8" Height="8" Fill="Orange" Margin="-4"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            
+            <!-- Test Gegner -->
+            <ItemsControl ItemsSource="{Binding Enemies}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas></Canvas>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Left" Value="{Binding E_x_pos}" ></Setter>
+                        <Setter Property="Canvas.Top" Value="{Binding E_y_pos}"></Setter>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Ellipse Width="20" Height="20" Fill="Red" Margin="-10"></Ellipse>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            
             
 
         </Canvas>
