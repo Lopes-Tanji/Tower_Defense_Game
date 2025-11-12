@@ -10,6 +10,9 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Tower_Defense_Game.GameLogic;
 using Tower_Defense_Game.GameObjekt;
+using System.Collections.ObjectModel;
+using System.Windows.Controls;
+
 
 namespace Tower_Defense_Game.GameState
 {

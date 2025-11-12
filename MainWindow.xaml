@@ -73,14 +73,35 @@
 
             <Separator Margin="0,12,0,12"/>
 
+            <TextBlock Text="Türme:" Foreground="LightGray" Margin="0,0,0,4"/>
+
+            <!-- Drei Buttons für Türme -->
+            <Button Content="Tower Typ 1" Click="SpawnTower1_Click" Margin="0,2,0,2"/>
+            <Button Content="Tower Typ 2" Click="SpawnTower2_Click" Margin="0,2,0,2"/>
+            <Button Content="Tower Typ 3" Click="SpawnTower3_Click" Margin="0,2,0,12"/>
+
+            <!-- Button zum Platzieren -->
+            <Button Content="Platzieren"
+            Click="PlaceTower_Click"
+            Background="LimeGreen"
+            Foreground="Black"
+            FontWeight="Bold"/>
+
+            <Separator Margin="0,12,0,12"/>
+
             <!-- Text zum testen des GameLoops und der Tickrate -->
             <TextBlock Text="Zeit: " Foreground="Gainsboro"/>
             <!-- Sekunden auf 1 Nachkommastelle formatieren -->
             <TextBlock Text="{Binding ElapsedSeconds, StringFormat={}{0:F1} s}" Foreground="LightBlue"/>
             <TextBlock Text="Frames: " Foreground="Gainsboro"/>
             <TextBlock Text="{Binding FrameCount}" Foreground="LightBlue"/>
+            
+
 
             <!-- Hier kommen später Buttons für Türme & Waves -->
+            <!-- Tower Buttons Panel -->
+            <TextBlock Text="Türme" Foreground="Gainsboro" Margin="0,12,0,4"/>
+            <StackPanel x:Name="TowerButtonsPanel" Margin="0,0,0,12"/>
             <TextBlock Text="(Weitere Buttons/Türme kommen später)"
                        Foreground="#aaa" TextWrapping="Wrap"/>
         </StackPanel>
