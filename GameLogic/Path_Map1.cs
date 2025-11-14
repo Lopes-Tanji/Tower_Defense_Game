@@ -15,7 +15,7 @@ namespace Tower_Defense_Game.GameLogic
         {
             var pts = new List<Waypoint>
             {
-                new( 40,  60),
+                new(  0,  60),
                 new(240,  60),
                 new(240, 180),
                 new( 80, 180),
@@ -28,8 +28,9 @@ namespace Tower_Defense_Game.GameLogic
                 new(520, 420),
                 new(760, 420),
                 new(760, 200),
-                new(980, 200),
-                new(980,  60) 
+                new(450, 200),
+                new(450,  60),
+                new(820,  60)
             };
 
             // Wir geben einen fertigen Path zurück

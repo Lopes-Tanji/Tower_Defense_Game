@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -45,6 +46,9 @@ namespace Tower_Defense_Game.GameState
         // Sammlung von Punkten, die WPF als Linienzug zeichnen kann
         public PointCollection PathPoints { get; }
 
+        // Gegner-Liste für die UI
+        //ObservableCollection<Enemy> Enemies war zu beginn List<Enemy> jedoch ist das Spiel gecrasht wenn der Test-Enemy gelöscht wurde.
+        public ObservableCollection<Enemy> Enemies { get; } = new();
 
         // Speichert, wie viele Sekunden das Spiel bereits gelaufen ist.
         // Der Wert wird im Update()-Loop pro Tick erhöht.
@@ -77,7 +81,7 @@ namespace Tower_Defense_Game.GameState
         }
 
         // GameLoop ist der "Motor" des Spiels.
-        // Er ruft regelmäßig (z.B. 30x pro Sekunde) Update(dt) auf.
+        // Er ruft regelmäßig (z.B. 30x pro Sekunde) Update(deltaTickTime) auf.
         // readonly bedeutet: einmal beim Erstellen gesetzt → kann später nicht ersetzt werden.
         private readonly GameLoop _loop;
 
@@ -94,12 +98,15 @@ namespace Tower_Defense_Game.GameState
 
             PathPoints = pc; // Jetzt kann XAML darauf binden
 
-            // GameLoop erstellen: ruft untenstehendes Update(dt) auf
+            // GameLoop erstellen: ruft untenstehendes Update(deltaTickTime) auf
             _loop = new GameLoop(Update, fps: 30);
             _loop.Start();
+
+            // Test-Enemy erstellt
+            Enemies.Add(new Enemy(GamePath, 100, 80, 30));
         }
 
-        // Diese Methode wird vom GameLoop aufgerufen (dt = vergangene Sekunden seit letztem Tick)
+        // Diese Methode wird vom GameLoop aufgerufen (deltaTickTime = vergangene Sekunden seit letztem Tick)
         private void Update(double deltaTickTime)
         {
             // Beweis dass es tickt: Zeit und Framezahl hochzählen
@@ -107,7 +114,31 @@ namespace Tower_Defense_Game.GameState
             FrameCount++;
 
             // HIER kommt die eigentliche Spiellogik hin:
+
             // - Gegner updaten
+            // .ToList() damit nicht ObservableCollection<Enemy> direkt verändert wird somit crasht es nicht.
+            foreach (var enemy in Enemies.ToList())
+            {
+                // Update Methode in Enemy.cs wird ausgeführt und somit die neue position von Enemy gesetzt
+                enemy.Update(deltaTickTime);
+
+                // Wenn der Gegner das ende erreicht dann wird ein Leben abgezogen und der Enemy verschwindet
+                if(enemy.ReachedEnd)
+                {
+                    Lives--;
+                    Enemies.Remove(enemy);
+                    continue;
+                }
+                // Wenn der Gegner stirbt wird Bounty dem Gold hinzugefügt und enemy Verschwindet
+                if(enemy.IsDead)
+                {
+                    Gold += enemy.Bounty;
+                    Enemies.Remove(enemy);
+                    continue;
+                }
+
+            }
+
             // - Türme updaten
             // - Projektile updaten
             // - Kollisions- / Treffer-Checks
