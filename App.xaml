@@ -4,6 +4,7 @@
              xmlns:local="clr-namespace:Tower_Defense_Game"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <!-- Converter für Bool damit die Visibility verändert werden kann -->
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
     </Application.Resources>
 </Application>

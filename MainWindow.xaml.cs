@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Tower_Defense_Game.GameLogic;
 using Tower_Defense_Game.GameState;
 
 namespace Tower_Defense_Game
@@ -25,6 +26,12 @@ namespace Tower_Defense_Game
             // Setzt das GameStateModel als "Datenquelle" für die UI
             // Ab jetzt kann die UI (XAML) auf Leben, Gold usw. zugreifen.
             DataContext = new GameStateModel();
+        }
+
+        // Wenn der Button geklickt wird wird ContinueButton() ausgelöst
+        private void Continue_Click(object sender, RoutedEventArgs e)
+        {
+            (DataContext as GameStateModel)?.ContinueButton();
         }
     }
 }
