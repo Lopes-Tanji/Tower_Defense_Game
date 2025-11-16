@@ -5,8 +5,10 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using Tower_Defense_Game.GameLogic;
@@ -22,6 +24,7 @@ namespace Tower_Defense_Game.GameState
     // wird hier gespeichert.
     public class GameStateModel : INotifyPropertyChanged
     {
+
         // Interne Felder zum Speichern der Werte Leben und Gold
         private int _lives = 20;
         private int _gold = 100;
@@ -38,6 +41,72 @@ namespace Tower_Defense_Game.GameState
         {
             get => _gold;
             set { _gold = value; OnPropertyChanged(); } // UI informieren
+        }
+
+
+        // Index der aktuellen wave
+        public int CurrentWave => _waves.CurrentIndex;
+        // bool zum erkennen ob die aktuelle wave läuft
+        public bool WaveRunning => _waves.IsRunning;
+
+        // privater bool zum erkennen ob der startscreen sichtbar ist
+        private bool _isStartScreen = true;
+
+        // public bool welcher mit OnPropertyChange sich updated also UI
+        public bool IsStartScreen 
+        { 
+            get => _isStartScreen;
+            set { _isStartScreen = value; OnPropertyChanged(); }
+        }
+
+        // privater bool um zu erkennen ob das spiel paussiert ist
+        private bool _isPaused = true;
+        // bool welcher geupdated wird(zwischen runden) also UI
+        public bool IsPaused
+        {
+            get => _isPaused;
+            set { _isPaused = value; OnPropertyChanged(); }
+        }
+
+        // Aufschrift des Continue Buttons muss noch verändert werden damit sich das nach start noch verändert mit OnPropertyChanged()
+        public string ContinueLabel =>
+             _isStartScreen ? "Spiel Starten"
+            : (_waves != null && !_waves.IsRunning && Enemies.Count == 0)? "Nächste Welle Starten"
+            : _isPaused ? "Weiter"
+            : "Weiter";
+
+        // logik hinter dem Continue Button
+        public void ContinueButton()
+        {
+            // Wenn der startscreen sichtbar ist soll der startscreen nicht mehr sichtbar sein und das spiel soll pausiert werden
+            // Das spiel soll zu beginn noch pausiert sein damit türme platziert werden können
+            if (IsStartScreen)
+            {
+                IsStartScreen = false;
+                IsPaused = true;
+                return;
+            }
+            // Wenn die wave nicht läuft und es keine enemies gibt
+            if (!_waves.IsRunning && Enemies.Count == 0)
+            {
+                // StartNextWave gibt einen bool zurück welcher dann mit IsPaused das spiel vortführt
+                var started = _waves.StartNextWave();
+                if(started)
+                {
+                    IsPaused = false;
+                }
+                else
+                {
+                    IsPaused = true;
+                }
+
+                // für Debug implementiert jedoch wird evt noch ganz hinzugefügt
+                OnPropertyChanged(nameof(CurrentWave));
+                OnPropertyChanged(nameof(WaveRunning));
+                return;
+            }
+
+            
         }
 
         // Das Pfad-Objekt für die Gegnerbewegung
@@ -85,6 +154,11 @@ namespace Tower_Defense_Game.GameState
         // readonly bedeutet: einmal beim Erstellen gesetzt → kann später nicht ersetzt werden.
         private readonly GameLoop _loop;
 
+        // Wird auf die klasse WaveManager zugegriffen
+        private readonly WaveManager _waves;
+        
+
+        // Konstruktor
         public GameStateModel()
         {
             // Hole Beispielpfad
@@ -98,22 +172,41 @@ namespace Tower_Defense_Game.GameState
 
             PathPoints = pc; // Jetzt kann XAML darauf binden
 
+            // Neuer WaveManager erstellt
+            _waves = new WaveManager(Enemies, GamePath);
+
+            // 100 Waves werden erstellt die mit jeder Runde immer stärker werden
+            for (int i = 1; i <= 101; i++)
+            {
+                _waves.AddWave(new Wave(10 * i, 20* (2 + (i / 10)), 80 * (1 + (i /10)), 0.5));
+            }
+
+            // Startscreen und IsPaused werden auf true gesetzt damit das Spiel nicht von anfang an läuft
+            IsStartScreen = true;
+            IsPaused = true;
+
             // GameLoop erstellen: ruft untenstehendes Update(deltaTickTime) auf
             _loop = new GameLoop(Update, fps: 30);
             _loop.Start();
 
-            // Test-Enemy erstellt
-            Enemies.Add(new Enemy(GamePath, 100, 80, 30));
+            
         }
 
         // Diese Methode wird vom GameLoop aufgerufen (deltaTickTime = vergangene Sekunden seit letztem Tick)
         private void Update(double deltaTickTime)
         {
+            // Wenn pausiert ist oder der Startscreen noch da ist wird nicht geubdated also das spiel läuft nicht
+
+            if (IsPaused || IsStartScreen)
+            {
+                return;
+            }
             // Beweis dass es tickt: Zeit und Framezahl hochzählen
             ElapsedSeconds += deltaTickTime;
             FrameCount++;
 
-            // HIER kommt die eigentliche Spiellogik hin:
+            // Update in waves wird aufgerufen
+            _waves.Update(deltaTickTime);
 
             // - Gegner updaten
             // .ToList() damit nicht ObservableCollection<Enemy> direkt verändert wird somit crasht es nicht.
@@ -127,22 +220,32 @@ namespace Tower_Defense_Game.GameState
                 {
                     Lives--;
                     Enemies.Remove(enemy);
-                    continue;
-                }
-                // Wenn der Gegner stirbt wird Bounty dem Gold hinzugefügt und enemy Verschwindet
-                if(enemy.IsDead)
-                {
-                    Gold += enemy.Bounty;
-                    Enemies.Remove(enemy);
-                    continue;
                 }
 
             }
+            // Es gab Probleme mit mehreren Gegner und ich weis nicht ob das wirklich was verändert hat
+            // Jedoch funktioniert es jetzt
+            // Wenn ein Gegner stirbt wird Bounty dem Gold hinzugefügt und enemy Verschwindet
+            foreach (var enemy in Enemies.Where(x => x.IsDead).ToList())
+            {
+                Gold += enemy.Bounty;
+                Enemies.Remove(enemy);
+            }
 
+            // Wenn wave nicht läuft und keine enemies mehr leben wird pausiert
+            if(!_waves.IsRunning && Enemies.Count == 0)
+            {
+                IsPaused = true;
+            }
+
+            OnPropertyChanged(nameof(WaveRunning));
+            OnPropertyChanged(nameof(CurrentWave));
+
+            
             // - Türme updaten
             // - Projektile updaten
             // - Kollisions- / Treffer-Checks
-            // - Aufräumen (tote Gegner/Projektile entfernen)
+            
         }
 
             // Dieses Event gehört zum INotifyPropertyChanged-Interface.
