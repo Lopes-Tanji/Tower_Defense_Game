@@ -11,7 +11,6 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using Tower_Defense_Game.GameLogic;
 using Tower_Defense_Game.GameObjekt;
-using System.Collections.ObjectModel;
 using System.Windows.Controls;
 
 
@@ -49,6 +48,8 @@ namespace Tower_Defense_Game.GameState
         // Gegner-Liste für die UI
         //ObservableCollection<Enemy> Enemies war zu beginn List<Enemy> jedoch ist das Spiel gecrasht wenn der Test-Enemy gelöscht wurde.
         public ObservableCollection<Enemy> Enemies { get; } = new();
+
+        public List<Tower> Towers { get; set; } = new List<Tower>();
 
         // Speichert, wie viele Sekunden das Spiel bereits gelaufen ist.
         // Der Wert wird im Update()-Loop pro Tick erhöht.
@@ -104,6 +105,9 @@ namespace Tower_Defense_Game.GameState
 
             // Test-Enemy erstellt
             Enemies.Add(new Enemy(GamePath, 100, 80, 30));
+
+                       
+
         }
 
         // Diese Methode wird vom GameLoop aufgerufen (deltaTickTime = vergangene Sekunden seit letztem Tick)
@@ -137,16 +141,31 @@ namespace Tower_Defense_Game.GameState
                     continue;
                 }
 
+                foreach (var tower in Towers)
+                {
+                    tower.Update(deltaTickTime); // Turm-Internes Update, z.B. Schuss-Timer hochzählen
+
+                    if (!tower.IsPlaced)
+                        continue; // Nur platzierte Türme dürfen schießen
+
+                    var target = tower.FindTarget(Enemies); // Sucht Gegner im Radius
+                    if (target != null)
+                        tower.Shoot(target); // Gegner Schaden zufügen
+                }
+
             }
 
             // - Türme updaten
+
+            
+
             // - Projektile updaten
             // - Kollisions- / Treffer-Checks
             // - Aufräumen (tote Gegner/Projektile entfernen)
         }
 
-            // Dieses Event gehört zum INotifyPropertyChanged-Interface.
-            // Es sorgt dafür, dass WPF erkennt, wenn sich ein Wert geändert hat.
+        // Dieses Event gehört zum INotifyPropertyChanged-Interface.
+        // Es sorgt dafür, dass WPF erkennt, wenn sich ein Wert geändert hat.
         public event PropertyChangedEventHandler? PropertyChanged;
 
         // Ruft PropertyChanged aus, ohne den Namen manuell schreiben zu müssen.

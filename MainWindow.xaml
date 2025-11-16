@@ -98,9 +98,9 @@
             <TextBlock Text="Türme:" Foreground="LightGray" Margin="0,0,0,4"/>
 
             <!-- Drei Buttons für Türme -->
-            <Button Content="Tower Typ 1" Click="SpawnTower1_Click" Margin="0,2,0,2"/>
-            <Button Content="Tower Typ 2" Click="SpawnTower2_Click" Margin="0,2,0,2"/>
-            <Button Content="Tower Typ 3" Click="SpawnTower3_Click" Margin="0,2,0,12"/>
+            <Button Content="Tower Typ 1 (30 Gold)" Click="SpawnTower1_Click" Margin="0,2,0,2"/>
+            <Button Content="Tower Typ 2 (30 Gold)" Click="SpawnTower2_Click" Margin="0,2,0,2"/>
+            <Button Content="Tower Typ 3 (30 Gold)" Click="SpawnTower3_Click" Margin="0,2,0,12"/>
 
             <!-- Button zum Platzieren -->
             <Button Content="Platzieren"

@@ -1,76 +1,135 @@
-﻿using System.Windows.Media;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Shapes;
+using Tower_Defense_Game.GameObjekt;
 
 namespace Tower_Defense_Game.GameObjekt
 {
-    internal class Tower
+    public class Tower
     {
-        // --- Basic Properties ---
-        public double X { get; set; }
-        public double Y { get; set; }
-
-        public double Range { get; set; } = 120; // Range in pixels
-        public double FireRate { get; set; } = 1.0; // shots per second
-        public int Damage { get; set; } = 10; // base damage per shot
-        public int Cost { get; } = 30; // cost to build the tower with gold coins
-
-        // --- Internal cooldown timer ---
-        private double _cooldown = 0;
-
-        // --- Visual representation ---
-        public Rectangle Sprite { get; }
-
-        // --- Drag/Placement ---
-        public bool IsPlaced { get; set; } = false;
-        public double CurrentX { get; set; }
-        public double CurrentY { get; set; }
-
-        // --- Tower type enum ---
         public enum TowerType { Type1, Type2, Type3 }
+
         public TowerType Type { get; }
 
-        public Tower(double x, double y, TowerType type)
+        public double CurrentX { get; set; }
+        public double CurrentY { get; set; }
+        public double Width { get; }
+        public double Height { get; }
+
+        public double Range { get; private set; }
+        public double FireRate { get; private set; }
+        public int Damage { get; private set; }
+
+        private double _fireCooldown;
+        public bool IsPlaced { get; set; }
+
+        public Rectangle Sprite { get; }
+
+        public Tower(double width, double height, TowerType type)
         {
-            X = x;
-            Y = y;
-            CurrentX = x;
-            CurrentY = y;
+            Width = width;
+            Height = height;
             Type = type;
+
+            Range = 100;
+            FireRate = 1.0;
+            Damage = 20;
+
+            _fireCooldown = 0;
+            IsPlaced = false;
 
             Sprite = new Rectangle
             {
-                Width = 30,
-                Height = 30,
-                Stroke = Brushes.Black,
-                StrokeThickness = 2,
+                Width = width,
+                Height = height,
                 Fill = type switch
                 {
-                    TowerType.Type1 => Brushes.DarkCyan,
-                    TowerType.Type2 => Brushes.Orange,
-                    TowerType.Type3 => Brushes.MediumPurple,
+                    TowerType.Type1 => Brushes.Blue,
+                    TowerType.Type2 => Brushes.Green,
+                    TowerType.Type3 => Brushes.Red,
                     _ => Brushes.Gray
                 }
             };
-
-            UpdatePosition();
         }
 
         public void Update(double deltaTime)
         {
-            if (_cooldown > 0)
-                _cooldown -= deltaTime;
-
-            // TODO: enemy targeting & shooting
+            if (!IsPlaced) return;
+            _fireCooldown -= deltaTime;
         }
 
-        public bool CanFire => _cooldown <= 0;
+        public Enemy FindTarget(IEnumerable<Enemy> enemies)
+        {
+            if (!IsPlaced) return null;
 
-        public void ResetCooldown() => _cooldown = 1.0 / FireRate;
+            return enemies
+                .Where(e => DistanceTo(e) <= Range)
+                .OrderByDescending(e => e.GetProgress()) // <- hier richtig die Enemy-Methode nutzen
+                .FirstOrDefault();
+        }
+
+        public void Shoot(Enemy target)
+        {
+            if (_fireCooldown > 0) return; // Noch nicht bereit
+            if (target == null) return;
+
+            target.TakeDamage(Damage);
+            _fireCooldown = 1.0 / FireRate; // Timer zurücksetzen
+
+            // --- VISUELLES FEEDBACK ---
+            var originalBrush = Sprite.Fill;         // aktuelle Farbe merken
+            Sprite.Fill = Brushes.Yellow;            // kurz gelb färben
+            var dispatcherTimer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(100) // 0,1 Sek sichtbar
+            };
+            dispatcherTimer.Tick += (s, e) =>
+            {
+                Sprite.Fill = originalBrush;           // Farbe zurücksetzen
+                dispatcherTimer.Stop();
+            };
+            dispatcherTimer.Start();
+        }
+
+        public double DistanceTo(Enemy enemy)
+        {
+            double dx = (CurrentX + Width / 2) - enemy.E_x_pos; // <- Enemy X-Property
+            double dy = (CurrentY + Height / 2) - enemy.E_y_pos; // <- Enemy Y-Property
+            return Math.Sqrt(dx * dx + dy * dy);
+        }
 
         public void UpdatePosition()
         {
-            System.Windows.Controls.Canvas.SetLeft(Sprite, CurrentX - Sprite.Width / 2);
-            System.Windows.Controls.Canvas.SetTop(Sprite, CurrentY - Sprite.Height / 2);
+            Canvas.SetLeft(Sprite, CurrentX);
+            Canvas.SetTop(Sprite, CurrentY);
+        }
+
+        public bool CheckCollision(IEnumerable<Tower> otherTowers, List<Point> pathPoints)
+        {
+            Rect myRect = new Rect(CurrentX, CurrentY, Width, Height);
+
+            foreach (var tower in otherTowers)
+            {
+                if (tower == this) continue;
+                Rect tRect = new Rect(tower.CurrentX, tower.CurrentY, tower.Width, tower.Height);
+                if (myRect.IntersectsWith(tRect)) return true;
+            }
+
+            double padding = 10;
+            foreach (var pt in pathPoints)
+            {
+                Rect pathRect = new Rect(pt.X - padding, pt.Y - padding, padding * 2, padding * 2);
+                if (myRect.IntersectsWith(pathRect)) return true;
+            }
+
+            return false;
         }
     }
 }
+
+
+
