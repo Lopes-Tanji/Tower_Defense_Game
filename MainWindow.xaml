@@ -77,21 +77,22 @@
         <StackPanel Grid.Column="1" Background="#1e1e1e">
 
             <!-- Überschrift -->
-            <TextBlock Text="Tower Defense" FontSize="20" Foreground="White" Margin="0,0,0,12"/>
+            <TextBlock Text="Tower Defense" FontSize="20" Foreground="White" Margin="20,0,0,12"/>
 
             <!-- Anzeige Lives -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal" Margin="20,0,0,8">
                 <TextBlock Text="Lives: " Foreground="Gainsboro"/>
                 <!-- Binding: Text zeigt Wert aus GameViewModel.Lives an -->
                 <TextBlock Text="{Binding Lives}" Foreground="LightGreen" FontWeight="SemiBold"/>
             </StackPanel>
 
             <!-- Anzeige Gold -->
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+            <StackPanel Orientation="Horizontal" Margin="20,0,0,8">
                 <TextBlock Text="Gold: " Foreground="Gainsboro"/>
                 <!-- Binding: Text zeigt Wert aus GameViewModel.Gold an -->
                 <TextBlock Text="{Binding Gold}" Foreground="Gold" FontWeight="SemiBold"/>
             </StackPanel>
+            <Button Content="{Binding ContinueLabel}" Click="Continue_Click" Margin="0,10,6,0" Height="20" Width="200"/>
 
             <Separator Margin="0,12,0,12"/>
 
@@ -112,7 +113,7 @@
             <Separator Margin="0,12,0,12"/>
 
             <!-- Text zum testen des GameLoops und der Tickrate -->
-            <TextBlock Text="Zeit: " Foreground="Gainsboro"/>
+            <TextBlock Text="Zeit: " Foreground="Gainsboro" Margin="20,0,0,0"/>
             <!-- Sekunden auf 1 Nachkommastelle formatieren -->
             <TextBlock Text="{Binding ElapsedSeconds, StringFormat={}{0:F1} s}" Foreground="LightBlue"/>
             <TextBlock Text="Frames: " Foreground="Gainsboro"/>
@@ -124,8 +125,24 @@
             <!-- Tower Buttons Panel -->
             <TextBlock Text="Türme" Foreground="Gainsboro" Margin="0,12,0,4"/>
             <StackPanel x:Name="TowerButtonsPanel" Margin="0,0,0,12"/>
+            <TextBlock Text="{Binding ElapsedSeconds, StringFormat={}{0:F1} s}" Foreground="LightBlue" Margin="20,0,0,0"/>
+            <TextBlock Text="Frames: " Foreground="Gainsboro" Margin="20,0,0,0"/>
+            <TextBlock Text="{Binding FrameCount}" Foreground="LightBlue" Margin="20,0,0,0"/>
+
+            <!-- Hier kommen später Buttons für Türme & Waves -->
+            <TextBlock Text="{Binding Enemies.Count, StringFormat=Enemies: {0}}" Foreground="LightBlue"/>
             <TextBlock Text="(Weitere Buttons/Türme kommen später)"
-                       Foreground="#aaa" TextWrapping="Wrap"/>
+                       Foreground="#aaa" TextWrapping="Wrap" Margin="20,0,0,0"/>
         </StackPanel>
+
+        <!-- Der StartScreen-->
+        <Grid Background="Silver"  Visibility="{Binding IsStartScreen, Converter={StaticResource BoolToVis}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="Tower Defense" HorizontalAlignment="Center"  FontSize="70" Margin="0,0,0,100"></TextBlock>
+                <Button Content="{Binding ContinueLabel}" Click="Continue_Click" Height="150" Width="500"></Button>
+                <TextBlock Text="Klicke auf Spiel Starten um das Spiel zu beginnen." HorizontalAlignment="Center" FontSize="35"></TextBlock>
+            </StackPanel>
+        </Grid>
+
     </Grid>
 </Window>
