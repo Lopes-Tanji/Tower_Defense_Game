@@ -103,5 +103,8 @@ namespace Tower_Defense_Game.GameObjekt
         // [CallerMemberName] füllt den Namen der Property automatisch ein.
         protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        public double GetProgress() => _distanceOnPath;
+
     }
 }
