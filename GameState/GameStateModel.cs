@@ -40,7 +40,7 @@ namespace Tower_Defense_Game.GameState
             set { _gold = value; OnPropertyChanged(); } // UI informieren
         }
 
-
+        
         // Index der aktuellen wave
         public int CurrentWave => _waves.CurrentIndex;
         // bool zum erkennen ob die aktuelle wave läuft
@@ -65,16 +65,27 @@ namespace Tower_Defense_Game.GameState
             set { _isPaused = value; OnPropertyChanged(); }
         }
 
+        // privater bool um zu erkennen ob das spiel beendet wurde
+        private bool _isEndScreen = false;
+        // bool welcher das update der UI aufruft
+        public bool IsEndScreen
+        {
+            get => _isEndScreen;
+            set { _isEndScreen = value; OnPropertyChanged(); }
+        }
+
+
+        private string _continueLabel;
         // Aufschrift des Continue Buttons muss noch verändert werden damit sich das nach start noch verändert mit OnPropertyChanged()
-        public string ContinueLabel =>
-             _isStartScreen ? "Spiel Starten"
-            : (_waves != null && !_waves.IsRunning && Enemies.Count == 0)? "Nächste Welle Starten"
-            : _isPaused ? "Weiter"
-            : "Weiter";
+        public string ContinueLabel
+        {
+            get => _continueLabel;
+            set { _continueLabel = value; OnPropertyChanged(); }
+        }     
 
         // logik hinter dem Continue Button
         public void ContinueButton()
-        {
+        {          
             // Wenn der startscreen sichtbar ist soll der startscreen nicht mehr sichtbar sein und das spiel soll pausiert werden
             // Das spiel soll zu beginn noch pausiert sein damit türme platziert werden können
             if (IsStartScreen)
@@ -97,10 +108,30 @@ namespace Tower_Defense_Game.GameState
                     IsPaused = true;
                 }
 
-                // für Debug implementiert jedoch wird evt noch ganz hinzugefügt
+                // UI spezifisch aktualisiert
                 OnPropertyChanged(nameof(CurrentWave));
                 OnPropertyChanged(nameof(WaveRunning));
                 return;
+            }
+            if (IsEndScreen) // Wenn der EndScreen sichtbar ist und der Continue Button gedrückt wurde
+            {
+                Enemies.Clear(); // Lösche alle noch Lebenden Enemies damit das Spiel nicht Freezed
+                // RestartWaves(); funktion in WaveManager ausgelöst welcher ein bool zurück gibt.
+                // Der zurück gegebene bool wird zwar nicht wirklich benötigt und war für eine ähnliche interaktion wie StartNextWave geplant
+                var started = _waves.RestartWaves(); // Resetet die wave
+                if(started)
+                {
+                    WaveAdder(); // Waves neu erstellt
+                    Lives = 20; // Leben zurückgesetzt
+                    Gold = 100; // Gold zurückgesetzt
+                    IsStartScreen = false; // StartScreen auf fals gesetzt um sicher zu gehen
+                    IsEndScreen = false; // Endscreen auf fals gesetzt um zu beenden 
+                    IsPaused = true; // Es wird pausiert damit türme gekauft werden können
+                }
+                // UI spezifisch aktualisiert
+                OnPropertyChanged(nameof(CurrentWave));
+                OnPropertyChanged(nameof(WaveRunning));
+
             }
 
             
@@ -154,7 +185,14 @@ namespace Tower_Defense_Game.GameState
         // Wird auf die klasse WaveManager zugegriffen
         private readonly WaveManager _waves;
         
-
+        public void WaveAdder()
+        {
+            // 100 Waves werden erstellt die mit jeder Runde immer stärker werden
+            for (int i = 1; i <= 101; i++)
+            {
+                _waves.AddWave(new Wave(10 * i, 20 * (2 + (i / 10)), 200 * (1 + (i / 10)), 0.5));
+            }
+        }
         // Konstruktor
         public GameStateModel()
         {
@@ -172,29 +210,48 @@ namespace Tower_Defense_Game.GameState
             // Neuer WaveManager erstellt
             _waves = new WaveManager(Enemies, GamePath);
 
-            // 100 Waves werden erstellt die mit jeder Runde immer stärker werden
-            for (int i = 1; i <= 101; i++)
-            {
-                _waves.AddWave(new Wave(10 * i, 20* (2 + (i / 10)), 80 * (1 + (i /10)), 0.5));
-            }
+            // Wurde aus GameStateModel Konstruktor entfernt damit beim Neustart die Waves eifacher neu erstellt werden können
+            WaveAdder();
 
             // Startscreen und IsPaused werden auf true gesetzt damit das Spiel nicht von anfang an läuft
             IsStartScreen = true;
             IsPaused = true;
+            IsEndScreen = false;
 
             // GameLoop erstellen: ruft untenstehendes Update(deltaTickTime) auf
             _loop = new GameLoop(Update, fps: 30);
             _loop.Start();
-
             
         }
 
         // Diese Methode wird vom GameLoop aufgerufen (deltaTickTime = vergangene Sekunden seit letztem Tick)
         private void Update(double deltaTickTime)
         {
+            // Update der beschriftung des Continue Button
+            if(_isStartScreen) // Wenn der Start Screen zu sehen ist
+            {
+                ContinueLabel = "Spiel Starten"; // Dann Label = Spiel Starten
+            }
+            // Wenn es noch wavesgibt dir waves nicht mehr läuft und keine Gegner mehr leben 
+            else if(_waves != null && !_waves.IsRunning && Enemies.Count == 0) 
+            {
+                ContinueLabel = "Nächste Welle starten"; // Dann Label = Nächste Welle starten
+            }
+            else if(_isPaused) // Wenn das Spiel Pausiert ist
+            {
+                ContinueLabel = "Weiter"; // Dann Label = Weiter
+            }
+            else if(_isEndScreen) // Wenn der EndScreen zu sehen ist
+            {
+                ContinueLabel = "Neustart"; // Dann Label = Neustart
+            }
+            else
+            {
+                ContinueLabel = "Weiter"; // Dann Label = Weiter
+            }
             // Wenn pausiert ist oder der Startscreen noch da ist wird nicht geubdated also das spiel läuft nicht
 
-            if (IsPaused || IsStartScreen)
+            if (IsPaused || IsStartScreen || IsEndScreen)
             {
                 return;
             }
@@ -202,8 +259,8 @@ namespace Tower_Defense_Game.GameState
             ElapsedSeconds += deltaTickTime;
             FrameCount++;
 
-            // Update in waves wird aufgerufen
-            _waves.Update(deltaTickTime);
+            // Update in waves wird aufgerufen (? wenn _waves null ist)
+            _waves?.Update(deltaTickTime);
 
             // - Gegner updaten
             // .ToList() damit nicht ObservableCollection<Enemy> direkt verändert wird somit crasht es nicht.
@@ -227,6 +284,11 @@ namespace Tower_Defense_Game.GameState
             {
                 Gold += enemy.Bounty;
                 Enemies.Remove(enemy);
+            }
+            // Wenn dein leben 0 oder weniger ist bist du tot und gehst zum EndScreen
+            if(Lives <= 0)
+            {
+                IsEndScreen = true;
             }
 
             // Wenn wave nicht läuft und keine enemies mehr leben wird pausiert
