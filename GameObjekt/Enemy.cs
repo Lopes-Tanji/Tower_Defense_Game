@@ -7,6 +7,8 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Media.Media3D;
 
 namespace Tower_Defense_Game.GameObjekt
 {
@@ -105,6 +107,8 @@ namespace Tower_Defense_Game.GameObjekt
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
         public double GetProgress() => _distanceOnPath;
+
+        
 
     }
 }

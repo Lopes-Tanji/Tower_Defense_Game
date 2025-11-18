@@ -18,6 +18,9 @@ namespace Tower_Defense_Game
         private GameStateModel _gameState;
         private Tower _draggedTower = null;
         private bool _isDragging = false;
+        private MediaPlayer _backgroundMusic;
+        public int Coins { get; set; } = 10000;      // Example starting coins
+        public Tower SelectedTower { get; set; }
 
         public MainWindow()
         {
@@ -26,6 +29,11 @@ namespace Tower_Defense_Game
             // GameStateModel instanziieren
             _gameState = new GameStateModel();
             DataContext = _gameState;
+            _backgroundMusic = new MediaPlayer();
+            _backgroundMusic.Open(new Uri("images/TDMusic.mp3", UriKind.Relative));
+            _backgroundMusic.MediaEnded += (s, e) => _backgroundMusic.Position = TimeSpan.Zero; // Loop
+            _backgroundMusic.Play();
+
 
             // Events für Drag & Drop
             GameCanvas.MouseMove += GameCanvas_MouseMove;
@@ -62,11 +70,11 @@ namespace Tower_Defense_Game
         {
             // Startposition oben links, kann mit Maus verschoben werden
             _draggedTower = new Tower(50, 50, type);
-            GameCanvas.Children.Add(_draggedTower.Sprite);
+            GameCanvas.Children.Add(_draggedTower.Container);
             _isDragging = true;
         }
 
-        private const int TowerCost = 30; // Kosten pro Turm
+        private const int TowerCost = 50; // Kosten pro Turm
 
         private void PlaceTower_Click(object sender, RoutedEventArgs e)
         {
@@ -107,6 +115,18 @@ namespace Tower_Defense_Game
         private void SpawnTower1_Click(object sender, RoutedEventArgs e) => SpawnTower(Tower.TowerType.Type1);
         private void SpawnTower2_Click(object sender, RoutedEventArgs e) => SpawnTower(Tower.TowerType.Type2);
         private void SpawnTower3_Click(object sender, RoutedEventArgs e) => SpawnTower(Tower.TowerType.Type3);
+
+        // Make sure this is set via your tower selection
+
+        private void UpgradeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is GameStateModel model)
+            {
+                model.UpgradeSelectedTower();
+            }
+        }
+
+
     }
 }
 

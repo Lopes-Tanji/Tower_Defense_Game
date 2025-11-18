@@ -10,10 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Shapes;
 using Tower_Defense_Game.GameLogic;
 using Tower_Defense_Game.GameObjekt;
-using System.Windows.Controls;
+
 
 
 namespace Tower_Defense_Game.GameState
@@ -52,10 +51,15 @@ namespace Tower_Defense_Game.GameState
         private bool _isStartScreen = true;
 
         // public bool welcher mit OnPropertyChange sich updated also UI
-        public bool IsStartScreen 
-        { 
+        public bool IsStartScreen
+        {
             get => _isStartScreen;
-            set { _isStartScreen = value; OnPropertyChanged(); }
+            set
+            {
+                _isStartScreen = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ContinueLabel)); // ContinueLabel neu melden, da es von IsStartScreen abhängt
+            }
         }
 
         // privater bool um zu erkennen ob das spiel paussiert ist
@@ -64,13 +68,18 @@ namespace Tower_Defense_Game.GameState
         public bool IsPaused
         {
             get => _isPaused;
-            set { _isPaused = value; OnPropertyChanged(); }
+            set
+            {
+                _isPaused = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ContinueLabel)); // ContinueLabel neu melden, da es von IsPaused abhängt
+            }
         }
 
         // Aufschrift des Continue Buttons muss noch verändert werden damit sich das nach start noch verändert mit OnPropertyChanged()
         public string ContinueLabel =>
              _isStartScreen ? "Spiel Starten"
-            : (_waves != null && !_waves.IsRunning && Enemies.Count == 0)? "Nächste Welle Starten"
+            : (_waves != null && !_waves.IsRunning && Enemies.Count == 0) ? "Nächste Welle Starten"
             : _isPaused ? "Weiter"
             : "Weiter";
 
@@ -82,7 +91,14 @@ namespace Tower_Defense_Game.GameState
             if (IsStartScreen)
             {
                 IsStartScreen = false;
-                IsPaused = true;
+
+                // Änderung: starte beim ersten Klick direkt die erste Wave.
+                // Wenn du stattdessen Türme platzieren willst, setze IsPaused = true.
+                var started = _waves.StartNextWave();
+                IsPaused = !started;
+
+                OnPropertyChanged(nameof(CurrentWave));
+                OnPropertyChanged(nameof(WaveRunning));
                 return;
             }
             // Wenn die wave nicht läuft und es keine enemies gibt
@@ -90,7 +106,7 @@ namespace Tower_Defense_Game.GameState
             {
                 // StartNextWave gibt einen bool zurück welcher dann mit IsPaused das spiel vortführt
                 var started = _waves.StartNextWave();
-                if(started)
+                if (started)
                 {
                     IsPaused = false;
                 }
@@ -105,7 +121,41 @@ namespace Tower_Defense_Game.GameState
                 return;
             }
 
-            
+
+        }
+
+        private Tower? _selectedTower;
+        public Tower? SelectedTower
+        {
+            get => _selectedTower;
+            set
+            {
+                if (_selectedTower != null)
+                    _selectedTower.ResetHighlight();
+
+                _selectedTower = value;
+
+                if (_selectedTower != null)
+                    _selectedTower.Highlight();
+
+                OnPropertyChanged();
+            }
+        }
+
+        public void UpgradeSelectedTower()
+        {
+            if (SelectedTower == null) return;
+
+            int cost = SelectedTower.Level == 1 ? 100 : 500;
+
+            if (Gold >= cost)
+            {
+                bool success = SelectedTower.Upgrade(); // tower upgrades itself
+                if (success)
+                {
+                    Gold -= cost; // reduce coins
+                }
+            }
         }
 
         // Das Pfad-Objekt für die Gegnerbewegung
@@ -118,7 +168,8 @@ namespace Tower_Defense_Game.GameState
         //ObservableCollection<Enemy> Enemies war zu beginn List<Enemy> jedoch ist das Spiel gecrasht wenn der Test-Enemy gelöscht wurde.
         public ObservableCollection<Enemy> Enemies { get; } = new();
 
-        public List<Tower> Towers { get; set; } = new List<Tower>();
+        public ObservableCollection<Tower> Towers { get; set; } = new ObservableCollection<Tower>();
+
 
         // Speichert, wie viele Sekunden das Spiel bereits gelaufen ist.
         // Der Wert wird im Update()-Loop pro Tick erhöht.
@@ -157,7 +208,7 @@ namespace Tower_Defense_Game.GameState
 
         // Wird auf die klasse WaveManager zugegriffen
         private readonly WaveManager _waves;
-        
+
 
         // Konstruktor
         public GameStateModel()
@@ -179,7 +230,7 @@ namespace Tower_Defense_Game.GameState
             // 100 Waves werden erstellt die mit jeder Runde immer stärker werden
             for (int i = 1; i <= 101; i++)
             {
-                _waves.AddWave(new Wave(10 * i, 20* (2 + (i / 10)), 80 * (1 + (i /10)), 0.5));
+                _waves.AddWave(new Wave(10 * i, 20 * (2 + (i / 10)), 80 * (1 + (i / 10)), 0.5));
             }
 
             // Startscreen und IsPaused werden auf true gesetzt damit das Spiel nicht von anfang an läuft
@@ -190,12 +241,7 @@ namespace Tower_Defense_Game.GameState
             _loop = new GameLoop(Update, fps: 30);
             _loop.Start();
 
-            
-            // Test-Enemy erstellt
-            Enemies.Add(new Enemy(GamePath, 100, 80, 30));
-
-                       
-
+            // Hinweis: Test-Enemy entfernt, damit das Wave-System korrekt startet.
         }
 
         // Diese Methode wird vom GameLoop aufgerufen (deltaTickTime = vergangene Sekunden seit letztem Tick)
@@ -222,7 +268,7 @@ namespace Tower_Defense_Game.GameState
                 enemy.Update(deltaTickTime);
 
                 // Wenn der Gegner das ende erreicht dann wird ein Leben abgezogen und der Enemy verschwindet
-                if(enemy.ReachedEnd)
+                if (enemy.ReachedEnd)
                 {
                     Lives--;
                     Enemies.Remove(enemy);
@@ -239,35 +285,38 @@ namespace Tower_Defense_Game.GameState
             }
 
             // Wenn wave nicht läuft und keine enemies mehr leben wird pausiert
-            if(!_waves.IsRunning && Enemies.Count == 0)
+            if (!_waves.IsRunning && Enemies.Count == 0)
             {
                 IsPaused = true;
             }
-                foreach (var tower in Towers)
-                {
-                    tower.Update(deltaTickTime); // Turm-Internes Update, z.B. Schuss-Timer hochzählen
+            foreach (var tower in Towers)
+            {
+                tower.Update(deltaTickTime); // Turm-Internes Update, z.B. Schuss-Timer hochzählen
 
-                    if (!tower.IsPlaced)
-                        continue; // Nur platzierte Türme dürfen schießen
+                if (!tower.IsPlaced)
+                    continue; // Nur platzierte Türme dürfen schießen
 
-                    var target = tower.FindTarget(Enemies); // Sucht Gegner im Radius
-                    if (target != null)
-                        tower.Shoot(target); // Gegner Schaden zufügen
-                }
+                var target = tower.FindTarget(Enemies);
+
+                // rotate always when seeing an enemy
+                tower.RotateTowards(target);
+
+                if (target != null)
+                    tower.Shoot(target);
+            }
 
             OnPropertyChanged(nameof(WaveRunning));
             OnPropertyChanged(nameof(CurrentWave));
 
-            
-            }
+
 
             // - Türme updaten
 
-            
+
 
             // - Projektile updaten
             // - Kollisions- / Treffer-Checks
-            
+
         }
 
         // Dieses Event gehört zum INotifyPropertyChanged-Interface.
