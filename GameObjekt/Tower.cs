@@ -66,9 +66,9 @@ namespace Tower_Defense_Game.GameObjekt
         // NEW: tower stats per type & level
         private static readonly Dictionary<TowerType, (int damage, double range, double fireRate)[]> TowerStats = new()
         {
-            { TowerType.Type1, new (int, double, double)[] { (20, 100, 1.0), (50, 120, 1.2), (100, 150, 1.5) } },
-            { TowerType.Type2, new (int, double, double)[] { (20, 100, 1.0), (40, 130, 1.0), (100, 200, 2) } },
-            { TowerType.Type3, new (int, double, double)[] { (20, 100, 1.0), (60, 110, 1.1), (120, 140, 1.4) } },
+            { TowerType.Type1, new (int, double, double)[] { (20, 100, 1.0), (30, 150, 2), (1000, 1000, 0.5) } },
+            { TowerType.Type2, new (int, double, double)[] { (20, 100, 1.0), (50, 200, 1.5), (33, 500, 10) } },
+            { TowerType.Type3, new (int, double, double)[] { (20, 100, 1.0), (300, 100, 1), (500, 100, 1.5) } },
         };
 
         // image cache to avoid reload problems
