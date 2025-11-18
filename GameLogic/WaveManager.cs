@@ -62,6 +62,23 @@ namespace Tower_Defense_Game.GameLogic
             return true;
         }
 
+        public bool RestartWaves()
+        {
+            // Die que mit den waves wird gelöscht damit die neu erstellten wieder am anfang
+            // sind sonst würde mann bei der runde anfangen wo man zuvor verlohren hat
+            _queue.Clear();
+            // Gespawnter gegner wird auf 0 gesetzt
+            _spawned = 0;
+            // Spawntimer der gegner wird auf 0 gesetzt so wird dirkt bei start ein neuer gegner generiert
+            _spawnTimer = 0;
+            // der Index der aktuellen wave wird auf 0 gesetzt also Wave 0
+            CurrentIndex = 0;
+            // Die wave wird wie beim start noch pausiert
+            IsRunning = false;
+            return true;
+
+        }
+
         // Ubdate von Waves
         public void Update(double deltaTickTime)
         {
