@@ -102,14 +102,8 @@ namespace Tower_Defense_Game.GameState
             if (IsStartScreen)
             {
                 IsStartScreen = false;
+                IsPaused = true;
 
-                // Änderung: starte beim ersten Klick direkt die erste Wave.
-                // Wenn du stattdessen Türme platzieren willst, setze IsPaused = true.
-                var started = _waves.StartNextWave();
-                IsPaused = !started;
-
-                OnPropertyChanged(nameof(CurrentWave));
-                OnPropertyChanged(nameof(WaveRunning));
                 return;
             }
             // Wenn die wave nicht läuft und es keine enemies gibt
