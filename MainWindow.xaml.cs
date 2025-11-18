@@ -60,6 +60,11 @@ namespace Tower_Defense_Game
 
         private void SpawnTower(Tower.TowerType type)
         {
+            if(_draggedTower != null) // Wenn ein Tower platziert wird darf nicht ein anderer Tower ausgewählt werden
+            {
+                MessageBox.Show("Platziere den Turm bevor du einen neuen Kaufst.");
+                return;
+            }
             // Startposition oben links, kann mit Maus verschoben werden
             _draggedTower = new Tower(50, 50, type);
             GameCanvas.Children.Add(_draggedTower.Sprite);

@@ -225,12 +225,6 @@ namespace Tower_Defense_Game.GameState
             // GameLoop erstellen: ruft untenstehendes Update(deltaTickTime) auf
             _loop = new GameLoop(Update, fps: 30);
             _loop.Start();
-            
-            // Test-Enemy erstellt
-            Enemies.Add(new Enemy(GamePath, 100, 80, 30));
-
-                       
-
         }
 
         // Diese Methode wird vom GameLoop aufgerufen (deltaTickTime = vergangene Sekunden seit letztem Tick)
@@ -305,30 +299,33 @@ namespace Tower_Defense_Game.GameState
             {
                 IsPaused = true;
             }
-                foreach (var tower in Towers)
+
+
+            foreach (var tower in Towers)
+            {
+                tower.Update(deltaTickTime); // Turm-Internes Update, z.B. Schuss-Timer hochzählen
+
+                if (!tower.IsPlaced)
                 {
-                    tower.Update(deltaTickTime); // Turm-Internes Update, z.B. Schuss-Timer hochzählen
-
-                    if (!tower.IsPlaced)
-                        continue; // Nur platzierte Türme dürfen schießen
-
-                    var target = tower.FindTarget(Enemies); // Sucht Gegner im Radius
-                    if (target != null)
-                        tower.Shoot(target); // Gegner Schaden zufügen
+                    continue; // Nur platzierte Türme dürfen schießen
                 }
+                       
+
+                var target = tower.FindTarget(Enemies); // Sucht Gegner im Radius
+                if (target != null)
+                {
+                    if(tower.Type == Tower.TowerType.Type2) // Wenn der aktuelle Tower typ 2 ist
+                    {
+                        target.Slow(1); // Wird das getroffene ziel verlangsamt
+                    }
+                    tower.Shoot(target); // Gegner Schaden zufügen
+                }
+                    
+            }
 
             OnPropertyChanged(nameof(WaveRunning));
             OnPropertyChanged(nameof(CurrentWave));
 
-            
-            }
-
-            // - Türme updaten
-
-            
-
-            // - Projektile updaten
-            // - Kollisions- / Treffer-Checks
             
         }
 

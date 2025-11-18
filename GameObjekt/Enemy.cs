@@ -36,9 +36,17 @@ namespace Tower_Defense_Game.GameObjekt
         public double HP { get; private set; }
         public double MaxHP { get; }
 
-        // Geschwindigkeit (wie viele Pixel pro Sekunde)
-        public double Speed { get; }
+        // Geschwindigkeit (wie viele Pixel pro Sekunde) wirde noch vorbereitet für Slows von Turm 2
+        public double Speed { get; set; }
 
+        // Ist der gegner verlangsamt bool
+        public bool IsSlowed { get; set; } = false;
+
+        // Ein int wo wenn verlangsamt wird hoch zählt bis eine zahl erreicht wird(sec * 30)
+        public int SlowTimer { get; set; } = 0;
+
+        
+        public int EffSlowTime { get; set; } 
         // Der weg der Gegner
         private readonly GOPath _path;
 
@@ -79,6 +87,23 @@ namespace Tower_Defense_Game.GameObjekt
                 return;
             }
 
+            if(IsSlowed) // Wenn der Enemy verlangsamt ist
+            {
+                if(SlowTimer == 0) // Wenn erster verlangsamter tick ist
+                {
+                    Speed /= 2; // Wird die geschwindigkeit durch 2 gerechnet
+                }
+
+                SlowTimer++; // Frame wird hochgezählt
+
+                if(SlowTimer <= 30 * EffSlowTime) // Wenn die Slow zeit erreicht wurde
+                {
+                    Speed *= 2; // Speed wieder Normal
+                    SlowTimer = 0; // SlowTime wird zurückgesetzt
+                    IsSlowed = false; // Enemy ist nicht mehr verlangsamt
+                }
+            }
+
             // Posizion des Gegners auf dem weg wird Berechnet
             _distanceOnPath += Speed * deltaTickTime;
 
@@ -94,6 +119,12 @@ namespace Tower_Defense_Game.GameObjekt
         public void TakeDamage(double damage)
         {
             HP -= damage;
+        }
+
+        public void Slow(int zeit)
+        {
+            EffSlowTime = zeit;
+            IsSlowed = true;
         }
 
         // Dieses Event gehört zum INotifyPropertyChanged-Interface.
