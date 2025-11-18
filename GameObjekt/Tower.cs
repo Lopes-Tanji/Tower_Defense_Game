@@ -92,6 +92,9 @@ namespace Tower_Defense_Game.GameObjekt
             return bmp;
         }
 
+        // Random zahl für istakill chance
+        Random random = new Random();
+
         public Tower(double width, double height, TowerType type)
         {
             Width = width;
@@ -199,11 +202,29 @@ namespace Tower_Defense_Game.GameObjekt
         // If a level-specific FlashSource exists we swap images; otherwise we use a short scale animation.
         public async void Shoot(Enemy target)
         {
-            if (_fireCooldown > 0) return;
+            
+            if (_fireCooldown > 0) return; // Noch nicht bereit
             if (target == null) return;
 
-            target.TakeDamage(Damage);
-            _fireCooldown = 1.0 / FireRate;
+            if(Type == TowerType.Type3) // Wenn der dritte Typ Tower schiesst 
+            {
+                int randomInstaKill = random.Next(1, 10); // Wird eine random zahl 
+                if(randomInstaKill == 5) // random zahl im zahlenbereich
+                {
+                    target.TakeDamage(Damage * 999); // Damage des Turms mal 999 damit es wie ein instakill ist
+                    
+                }
+                else
+                {
+                    target.TakeDamage(Damage); // damage an enemy
+                }
+            }
+            else
+            {
+                target.TakeDamage(Damage);// damage an enemy
+            }
+            
+            _fireCooldown = 1.0 / FireRate; // Timer zurücksetzen
 
             // Cancel and dispose previous CTS
             if (_flashCts != null)
