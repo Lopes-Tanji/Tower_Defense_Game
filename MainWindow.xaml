@@ -49,6 +49,7 @@
             </ItemsControl>
             
             <!-- Test Gegner -->
+            <!-- Test Gegner (Sprite statt roter Punkte) -->
             <ItemsControl ItemsSource="{Binding Enemies}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -58,18 +59,25 @@
 
                 <ItemsControl.ItemContainerStyle>
                     <Style TargetType="ContentPresenter">
-                        <Setter Property="Canvas.Left" Value="{Binding E_x_pos}" ></Setter>
-                        <Setter Property="Canvas.Top" Value="{Binding E_y_pos}"></Setter>
+                        <Setter Property="Canvas.Left" Value="{Binding E_x_pos}" />
+                        <Setter Property="Canvas.Top" Value="{Binding E_y_pos}" />
                     </Style>
                 </ItemsControl.ItemContainerStyle>
+
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Ellipse Width="20" Height="20" Fill="Red" Margin="-10"></Ellipse>
+                        <Image Width="48" Height="48" Margin="-24"
+           Source="pack://application:,,,/images/Enemy.png"
+           RenderTransformOrigin="0.5,0.5">
+                            <Image.RenderTransform>
+                                <RotateTransform Angle="{Binding Rotation}" />
+                            </Image.RenderTransform>
+                        </Image>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            
-            
+
+
 
         </Canvas>
 
@@ -104,9 +112,9 @@
             <TextBlock Text="Türme:" Foreground="LightGray" Margin="0,0,0,4"/>
 
             <!-- Drei Buttons für Türme -->
-            <Button Content="Tower Typ 1 (30 Gold)" Click="SpawnTower1_Click" Margin="0,2,0,2"/>
-            <Button Content="Tower Typ 2 (30 Gold)" Click="SpawnTower2_Click" Margin="0,2,0,2"/>
-            <Button Content="Tower Typ 3 (30 Gold)" Click="SpawnTower3_Click" Margin="0,2,0,12"/>
+            <Button Content="Tower Typ 1 (50 Gold)" Click="SpawnTower1_Click" Margin="0,2,0,2"/>
+            <Button Content="Tower Typ 2 (50 Gold)" Click="SpawnTower2_Click" Margin="0,2,0,2"/>
+            <Button Content="Tower Typ 3 (50 Gold)" Click="SpawnTower3_Click" Margin="0,2,0,12"/>
 
             <!-- Button zum Platzieren -->
             <Button Content="Platzieren"
@@ -114,8 +122,34 @@
             Background="LimeGreen"
             Foreground="Black"
             FontWeight="Bold"/>
+            <Button x:Name="UpgradeButton" Content="Upgrade" Click="UpgradeButton_Click"/>
 
             <Separator Margin="0,12,0,12"/>
+
+            <ListBox x:Name="TowerList"
+         Grid.Row="1"
+         ItemsSource="{Binding Towers}"
+         SelectedItem="{Binding SelectedTower, Mode=TwoWay}"
+         Background="#222"
+         Foreground="White"
+         BorderBrush="#555"
+         Margin="10"
+         ScrollViewer.VerticalScrollBarVisibility="Auto"
+         ScrollViewer.CanContentScroll="True"
+         MaxHeight="300">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Margin="2">
+                            <!-- Tower image -->
+                            <Image Source="{Binding Sprite.Source}" Width="30" Height="30"/>
+
+                            <!-- Tower name -->
+                            <TextBlock Text="{Binding Name}" Foreground="White" Margin="5,0,0,0"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
 
             <!-- Text zum testen des GameLoops und der Tickrate -->
             <TextBlock Text="Zeit: " Foreground="Gainsboro" Margin="20,0,0,0"/>
