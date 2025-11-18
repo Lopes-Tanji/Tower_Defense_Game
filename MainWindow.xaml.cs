@@ -18,8 +18,7 @@ namespace Tower_Defense_Game
         private GameStateModel _gameState;
         private Tower _draggedTower = null;
         private bool _isDragging = false;
-        private MediaPlayer _backgroundMusic;
-        public int Coins { get; set; } = 10000;      // Example starting coins
+        private MediaPlayer _backgroundMusic;     // Example starting coins
         public Tower SelectedTower { get; set; }
 
         public MainWindow()

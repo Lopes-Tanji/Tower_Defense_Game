@@ -146,7 +146,7 @@ namespace Tower_Defense_Game.GameState
         {
             if (SelectedTower == null) return;
 
-            int cost = SelectedTower.Level == 1 ? 100 : 500;
+            int cost = SelectedTower.Level == 1 ? 10 : 40;
 
             if (Gold >= cost)
             {

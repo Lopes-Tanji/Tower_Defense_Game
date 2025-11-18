@@ -49,6 +49,7 @@
             </ItemsControl>
             
             <!-- Test Gegner -->
+            <!-- Test Gegner (Sprite statt roter Punkte) -->
             <ItemsControl ItemsSource="{Binding Enemies}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -58,18 +59,25 @@
 
                 <ItemsControl.ItemContainerStyle>
                     <Style TargetType="ContentPresenter">
-                        <Setter Property="Canvas.Left" Value="{Binding E_x_pos}" ></Setter>
-                        <Setter Property="Canvas.Top" Value="{Binding E_y_pos}"></Setter>
+                        <Setter Property="Canvas.Left" Value="{Binding E_x_pos}" />
+                        <Setter Property="Canvas.Top" Value="{Binding E_y_pos}" />
                     </Style>
                 </ItemsControl.ItemContainerStyle>
+
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Ellipse Width="20" Height="20" Fill="Red" Margin="-10"></Ellipse>
+                        <Image Width="48" Height="48" Margin="-24"
+           Source="pack://application:,,,/images/Enemy.png"
+           RenderTransformOrigin="0.5,0.5">
+                            <Image.RenderTransform>
+                                <RotateTransform Angle="{Binding Rotation}" />
+                            </Image.RenderTransform>
+                        </Image>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            
-            
+
+
 
         </Canvas>
 
