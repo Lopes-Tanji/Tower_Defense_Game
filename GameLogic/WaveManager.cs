@@ -79,7 +79,7 @@ namespace Tower_Defense_Game.GameLogic
 
         }
 
-        // Ubdate von Waves
+        // Update von Waves
         public void Update(double deltaTickTime)
         {
             // Hier gab es ein riesen Problem das ! vor IsRunning wurde vergessen und so wurden 2-3h verschwendet
