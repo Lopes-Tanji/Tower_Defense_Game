@@ -137,7 +137,7 @@
             FontWeight="Bold"/>
             <Separator Margin="0,6,0,6"/>
             <!--Upgrade Button-->
-            <Button x:Name="UpgradeButton" Content="Upgrade (Level 2: 5k Gold, Level 3: 50k Gold" Click="UpgradeButton_Click"/>
+            <Button x:Name="UpgradeButton" Content="Upgrade (Level 2: 1k Gold, Level 3: 10k Gold" Click="UpgradeButton_Click"/>
             <Separator Margin="0,6,0,6"/>
             <!--Delete Button-->
             <Button Content="Delete"

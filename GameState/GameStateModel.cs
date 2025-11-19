@@ -170,7 +170,7 @@ namespace Tower_Defense_Game.GameState
         {
             if (SelectedTower == null) return; // kein Turm ausgewählt
 
-            int cost = SelectedTower.Level == 1 ? 10 : 40; // Upgrade-Kosten basierend auf Level
+            int cost = SelectedTower.Level == 1 ? 1000 : 10000; // Upgrade-Kosten basierend auf Level
 
             if (Gold >= cost) // genug Gold vorhanden
             {
@@ -239,7 +239,7 @@ namespace Tower_Defense_Game.GameState
             // 100 Waves werden erstellt die mit jeder Runde immer stärker werden
             for (int i = 1; i <= 101; i++)
             {                          //Anzahl       HP              Geschwindigkeit      Interval des Spawnen
-                _waves.AddWave(new Wave(10 * i, 20 * (2 + (i / 10)), 200 * (1 + (i / 10)), 0.5));
+                _waves.AddWave(new Wave(10 * i, 20 * (2 + i), 200 * (1 + (i / 100)), 0.5));
             }
         }
         // Konstruktor
