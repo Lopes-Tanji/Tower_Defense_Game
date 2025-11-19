@@ -16,17 +16,27 @@
         </Grid.ColumnDefinitions>
 
         <!-- Spielfeld -->
-        <Canvas x:Name="GameCanvas" Background="#2b2f33" Margin="12">
+        <Canvas x:Name="GameCanvas" Margin="12">
+            <Canvas.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#E6FBFF" Offset="0.0"/>
+                    <!-- ice blue -->
+                    <GradientStop Color="#6EC6FF" Offset="0.5"/>
+                    <!-- sky blue -->
+                    <GradientStop Color="#00E5FF" Offset="1.0"/>
+                    <!-- cyan -->
+                </LinearGradientBrush>
+            </Canvas.Background>
 
             <!-- Sichtbarer Weg: weiße Linie + breite "Straße" darunter -->
             <!-- Breite graue Straße -->
             <Polyline Points="{Binding PathPoints}"
-              Stroke="#404040" StrokeThickness="24"
+              Stroke=" #D4AF37" StrokeThickness="24"
               StrokeLineJoin="Round"/>
 
             <!-- Weiße gestrichelte Mittellinie -->
             <Polyline Points="{Binding PathPoints}"
-              Stroke="White" StrokeThickness="2"
+              Stroke="#3E8E41" StrokeThickness="2"
               StrokeDashArray="2 3"
               StrokeLineJoin="Round"/>
             <!--    Wegpunkte anzeigen, hilft beim Debuggen -->
@@ -43,7 +53,7 @@
                 </ItemsControl.ItemContainerStyle>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Ellipse Width="8" Height="8" Fill="Orange" Margin="-4"/>
+                        <Ellipse Width="8" Height="8" Fill="#26619C" Margin="-4"/>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
@@ -113,21 +123,22 @@
             <!-- Drei Buttons für Türme -->
             <Button Content="Drone of Doom (50 Gold)" Click="SpawnTower1_Click" Margin="0,2,0,2"/>
             <Button Content="Drone of Demise  (50 Gold)" Click="SpawnTower2_Click" Margin="0,2,0,2"/>
-            <Button Content="Drone of Downfall (50 Gold)" Click="SpawnTower3_Click" Margin="0,2,0,12"/>
-
+            <Button Content="Drone of Downfall (50 Gold)" Click="SpawnTower3_Click" Margin="0,2,0,0"/>
+            <Separator Margin="0,6,0,6"/>
             <!-- Button zum Platzieren -->
             <Button Content="Platzieren"
             Click="PlaceTower_Click"
             Background="LimeGreen"
             Foreground="Black"
             FontWeight="Bold"/>
-            <Button x:Name="UpgradeButton" Content="Upgrade" Click="UpgradeButton_Click"/>
+            <Separator Margin="0,6,0,6"/>
+            <Button x:Name="UpgradeButton" Content="Upgrade (Level 2: 5k Gold, Level 3: 50k Gold" Click="UpgradeButton_Click"/>
+            <Separator Margin="0,6,0,6"/>
             <Button Content="Delete"
         Click="DeleteTower_Click"
-        Margin="0,6,0,0"
         Background="IndianRed"
         Foreground="White"/>
-            <Separator Margin="0,12,0,12"/>
+            <Separator Margin="0,6,0,6"/>
 
             <ListBox x:Name="TowerList"
          Grid.Row="1"
@@ -153,28 +164,8 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-
-            <!-- Text zum testen des GameLoops und der Tickrate -->
-            <TextBlock Text="Zeit: " Foreground="Gainsboro" Margin="20,0,0,0"/>
-            <!-- Sekunden auf 1 Nachkommastelle formatieren -->
-            <TextBlock Text="{Binding ElapsedSeconds, StringFormat={}{0:F1} s}" Foreground="LightBlue"/>
-            <TextBlock Text="Frames: " Foreground="Gainsboro"/>
-            <TextBlock Text="{Binding FrameCount}" Foreground="LightBlue"/>
             
 
-
-            <!-- Hier kommen später Buttons für Türme & Waves -->
-            <!-- Tower Buttons Panel -->
-            <TextBlock Text="Türme" Foreground="Gainsboro" Margin="0,12,0,4"/>
-            <StackPanel x:Name="TowerButtonsPanel" Margin="0,0,0,12"/>
-            <TextBlock Text="{Binding ElapsedSeconds, StringFormat={}{0:F1} s}" Foreground="LightBlue" Margin="20,0,0,0"/>
-            <TextBlock Text="Frames:" Foreground="Gainsboro" Margin="20,0,0,0"/>
-            <TextBlock Text="{Binding FrameCount}" Foreground="LightBlue" Margin="20,0,0,0"/>
-
-            <!-- Hier kommen später Buttons für Türme & Waves -->
-            <TextBlock Text="{Binding Enemies.Count, StringFormat=Enemies: {0}}" Foreground="LightBlue"/>
-            <TextBlock Text="(Weitere Buttons/Türme kommen später)"
-                       Foreground="#aaa" TextWrapping="Wrap" Margin="20,0,0,0"/>
         </StackPanel>
 
         <!-- Der StartScreen-->

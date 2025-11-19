@@ -26,12 +26,12 @@ namespace Tower_Defense_Game.GameLogic
         // gefäs der ticks wo wenn bei 0 ist ein gegner generiert wird
         private double _spawnTimer;
 
-        // ist die Wave noch am lauffen
+        // ist die Wave noch am laufen
         public bool IsRunning { get; private set; }
         // Index der aktuellen Wave
         public int CurrentIndex { get; private set; }
 
-        //Konstrucktor
+        //Konstruktor
         public WaveManager(ObservableCollection<Enemy> enemies, GOPath gamePath)
         {
             this._enemies = enemies;
@@ -53,7 +53,7 @@ namespace Tower_Defense_Game.GameLogic
             _current = _queue.Dequeue();
             // Gespawnter gegner wird auf 0 gesetzt
             _spawned = 0;
-            // Spawntimer der gegner wird auf 0 gesetzt so wird dirkt bei start ein neuer gegner generiert
+            // Spawntimer der gegner wird auf 0 gesetzt so wird direkt bei start ein neuer gegner generiert
             _spawnTimer = 0;
             // der Index der aktuellen wave + 1
             CurrentIndex++;
@@ -69,7 +69,7 @@ namespace Tower_Defense_Game.GameLogic
             _queue.Clear();
             // Gespawnter gegner wird auf 0 gesetzt
             _spawned = 0;
-            // Spawntimer der gegner wird auf 0 gesetzt so wird dirkt bei start ein neuer gegner generiert
+            // Spawntimer der gegner wird auf 0 gesetzt so wird direkt bei start ein neuer gegner generiert
             _spawnTimer = 0;
             // der Index der aktuellen wave wird auf 0 gesetzt also Wave 0
             CurrentIndex = 0;
