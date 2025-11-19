@@ -158,16 +158,13 @@
                             <Image Source="{Binding Sprite.Source}" Width="30" Height="30"/>
 
                             <!-- Tower name -->
-                            <TextBlock Text="{Binding Name}" Foreground="White" Margin="5,0,0,0"/>
+                            <TextBlock Text="{Binding Type}" Foreground="White" Margin="5,0,0,0"/>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <Button Content="Info"
-            Background="Yellow"
-            Foreground="Black"
-            FontWeight="Bold"/>
+            
 
         </StackPanel>
 
