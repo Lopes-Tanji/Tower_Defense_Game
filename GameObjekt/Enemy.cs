@@ -15,7 +15,6 @@ namespace Tower_Defense_Game.GameObjekt
     public class Enemy : INotifyPropertyChanged
     {
         // globaler Multiplikator zum schnellen Anpassen aller Enemy-Geschwindigkeiten
-        public static double SpeedMultiplier { get; set; } = 0.7;
 
         // X und Y Possizionen der Enemys auf dem canvas
         private double _e_x_pos;
@@ -118,32 +117,28 @@ namespace Tower_Defense_Game.GameObjekt
             }
 
             // Posizion des Gegners auf dem weg wird Berechnet
-            _distanceOnPath += Speed * deltaTickTime;
-
-            // SpeedMultiplier anwenden, so kannst du global die Geschwindigkeit anpassen
-            _distanceOnPath += Speed * deltaTickTime * SpeedMultiplier;
-
-            var (x, y) = _path.PositionAt(_distanceOnPath);
-            this.E_x_pos = x;
-            this.E_y_pos = y;
+            _distanceOnPath += Speed * deltaTickTime; // deltaTickTime in Sekunden
+            var (x, y) = _path.PositionAt(_distanceOnPath); // Neue Position auf dem weg
+            this.E_x_pos = x; // X pos setzen
+            this.E_y_pos = y; // Y pos setzen
 
             // Rotation anhand Tangente berechnen
             UpdateRotationAtDistance(_distanceOnPath);
         }
 
-        private void UpdateRotationAtDistance(double distance)
+        private void UpdateRotationAtDistance(double distance) // Berechnet die Rotation des Gegners basierend auf seiner Position auf dem Pfad
         {
             // Kleinen Schritt vorwärts zum Berechnen der Tangentenrichtung
-            double step = Math.Max(1.0, Speed * 0.05);
-            double next = Math.Min(distance + step, _path.TotalLength);
+            double step = Math.Max(1.0, Speed * 0.05); // Mindestens 1 Pixel oder 5% der Geschwindigkeit
+            double next = Math.Min(distance + step, _path.TotalLength); // Nächste Position auf dem Pfad
 
-            var (x1, y1) = _path.PositionAt(distance);
-            var (x2, y2) = _path.PositionAt(next);
+            var (x1, y1) = _path.PositionAt(distance); // Aktuelle Position
+            var (x2, y2) = _path.PositionAt(next); // Nächste Position
 
-            double dx = x2 - x1;
-            double dy = y2 - y1;
+            double dx = x2 - x1; // Delta X
+            double dy = y2 - y1; // Delta Y
 
-            if (Math.Abs(dx) < 1e-6 && Math.Abs(dy) < 1e-6) return;
+            if (Math.Abs(dx) < 1e-6 && Math.Abs(dy) < 1e-6) return; // Keine Bewegung, Rotation nicht ändern
 
             // Atan2 -> Grad, 0° = rechts, +Y nach unten (WPF Koordinaten)
             double angle = Math.Atan2(dy, dx) * 180.0 / Math.PI;
@@ -151,7 +146,7 @@ namespace Tower_Defense_Game.GameObjekt
             // Offset +90° damit Sprite um 90° nach rechts verschoben ist
             angle += 90.0;
 
-            Rotation = angle;
+            Rotation = angle; // Rotation setzen
         }
 
         // Gegner bekommt schaden
@@ -171,6 +166,6 @@ namespace Tower_Defense_Game.GameObjekt
         protected void OnPropertyChanged([CallerMemberName] string? name = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
-        public double GetProgress() => _distanceOnPath;
+        public double GetProgress() => _distanceOnPath; // Gibt den Fortschritt des Gegners auf dem Pfad zurück
     }
 }

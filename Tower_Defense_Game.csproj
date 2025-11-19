@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="images\Beckgraund.webp" />
+    <None Remove="images\Beckgraund.png" />
     <None Remove="images\Blue1.png" />
     <None Remove="images\Blue2.png" />
     <None Remove="images\Blue3.png" />
@@ -26,7 +26,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="images\Beckgraund.webp" />
+    <Resource Include="images\Beckgraund.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Content Include="images\CATHARSISTD.m4a">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

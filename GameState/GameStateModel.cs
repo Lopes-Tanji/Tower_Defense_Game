@@ -147,36 +147,36 @@ namespace Tower_Defense_Game.GameState
 
         }
 
-        private Tower? _selectedTower;
-        public Tower? SelectedTower
+        private Tower? _selectedTower; // aktuell ausgewählter Turm
+        public Tower? SelectedTower // Property für den aktuell ausgewählten Turm
         {
             get => _selectedTower;
-            set
+            set // wenn ein neuer Turm ausgewählt wird
             {
-                if (_selectedTower != null)
-                    _selectedTower.ResetHighlight();
+                if (_selectedTower != null) // wenn es einen ausgewählten Turm gibt
+                    _selectedTower.ResetHighlight(); // alten Turm enthighlighten
 
-                _selectedTower = value;
+                _selectedTower = value; // neuen Turm setzen
 
-                if (_selectedTower != null)
-                    _selectedTower.Highlight();
+                if (_selectedTower != null) // wenn der neue Turm nicht null ist
+                    _selectedTower.Highlight(); // neuen Turm highlighten
 
-                OnPropertyChanged();
+                OnPropertyChanged(); // UI informieren
             }
         }
 
-        public void UpgradeSelectedTower()
+        public void UpgradeSelectedTower() // Methode zum Upgraden des ausgewählten Turms
         {
-            if (SelectedTower == null) return;
+            if (SelectedTower == null) return; // kein Turm ausgewählt
 
-            int cost = SelectedTower.Level == 1 ? 10 : 40;
+            int cost = SelectedTower.Level == 1 ? 10 : 40; // Upgrade-Kosten basierend auf Level
 
-            if (Gold >= cost)
+            if (Gold >= cost) // genug Gold vorhanden
             {
                 bool success = SelectedTower.Upgrade(); // tower upgrades itself
-                if (success)
+                if (success) // Wenn Upgrade erfolgreich
                 {
-                    Gold -= cost; // reduce coins
+                    Gold -= cost; // reduziere Gold
                 }
             }
         }
@@ -191,7 +191,7 @@ namespace Tower_Defense_Game.GameState
         //ObservableCollection<Enemy> Enemies war zu beginn List<Enemy> jedoch ist das Spiel gecrasht wenn der Test-Enemy gelöscht wurde.
         public ObservableCollection<Enemy> Enemies { get; } = new();
 
-        public ObservableCollection<Tower> Towers { get; set; } = new ObservableCollection<Tower>();
+        public ObservableCollection<Tower> Towers { get; set; } = new ObservableCollection<Tower>(); // Turm-Liste für die UI
 
 
         // Speichert, wie viele Sekunden das Spiel bereits gelaufen ist.
@@ -274,7 +274,6 @@ namespace Tower_Defense_Game.GameState
             _loop = new GameLoop(Update, fps: 30);
             _loop.Start();
 
-            // Hinweis: Test-Enemy entfernt, damit das Wave-System korrekt startet.
         }
 
         // Diese Methode wird vom GameLoop aufgerufen (deltaTickTime = vergangene Sekunden seit letztem Tick)
