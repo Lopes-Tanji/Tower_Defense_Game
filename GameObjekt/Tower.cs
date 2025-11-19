@@ -18,32 +18,31 @@ namespace Tower_Defense_Game.GameObjekt
 {
     public class Tower : INotifyPropertyChanged
     {
-        public enum TowerType { DroneOfDoom, DroneOfDemise, DroneOfDownfall }
+        public enum TowerType { DroneOfDoom, DroneOfDemise, DroneOfDownfall } //Namengebung der 3 Turmtypen
 
-        public TowerType Type { get; }
+        public TowerType Type { get; } // Turmtyp Property
 
-        public int Level { get; private set; } = 1; // NEW: tower level, starts at 1
+        public int Level { get; private set; } = 1; // Level Property
 
-        public double CurrentX { get; set; }
-        public double CurrentY { get; set; }
-        public double Width { get; }
-        public double Height { get; }
-        public string Name { get; set; }
-        public double Range { get; private set; }
-        public double FireRate { get; private set; }
-        public int Damage { get; private set; }
+        public double CurrentX { get; set; } // Aktuelle X-Position auf dem Canvas
+        public double CurrentY { get; set; } // Aktuelle Y-Position auf dem Canvas
+        public double Width { get; } // Breite des Turms
+        public double Height { get; } // Höhe des Turms
+        public double Range { get; private set; } // Angriffsreichweite des Turms (Radius)
+        public double FireRate { get; private set; } // Feuerrate
+        public int Damage { get; private set; } // Schaden pro Schuss
 
-        private double _fireCooldown;
-        public bool IsPlaced { get; set; }
+        private double _fireCooldown; // Timer bis zum nächsten Schuss
+        public bool IsPlaced { get; set; } // Ob der Turm platziert wurde
 
-        private Image _sprite;
-        private System.Threading.CancellationTokenSource? _flashCts;
+        private Image _sprite; // Bild des Turms
+        private System.Threading.CancellationTokenSource? _flashCts; // CancellationTokenSource für Flash-Effekt
 
         // Transform für kurzen visuellen Effekt, falls kein Flash-Bild vorhanden
         private readonly RotateTransform _rotateTransform = new RotateTransform();
         private readonly ScaleTransform _flashScaleTransform = new ScaleTransform(1, 1);
 
-        public Image Sprite
+        public Image Sprite // Property für das Bild des Turms
         {
             get => _sprite;
             set
@@ -51,12 +50,11 @@ namespace Tower_Defense_Game.GameObjekt
                 _sprite = value; OnPropertyChanged();
             }
         }
-        public Border Container { get; }
-        public ImageSource OriginalSource { get; private set; }
-        public ImageSource HighlightSource { get; private set; }
-        public ImageSource FlashSource { get; private set; }
+        public Border Container { get; } // Border um den Turm für Hervorhebung
+        public ImageSource OriginalSource { get; private set; } // Originalbild des Turms
+        public ImageSource FlashSource { get; private set; } // Bild für Flash-Effekt
 
-        // NEW: tower images per type & level
+        // Turm -Bilder pro Typ & Level
         private static readonly Dictionary<TowerType, string[]> TowerImages = new()
         {
             
@@ -101,8 +99,7 @@ namespace Tower_Defense_Game.GameObjekt
         {
             Width = width;
             Height = height;
-            Type = type;
-            Name = type.ToString();
+            Type = type; 
 
             Level = 1;
 
