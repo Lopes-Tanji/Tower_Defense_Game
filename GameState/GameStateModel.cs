@@ -58,7 +58,6 @@ namespace Tower_Defense_Game.GameState
             {
                 _isStartScreen = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(ContinueLabel)); // ContinueLabel neu melden, da es von IsStartScreen abhängt
             }
         }
 
@@ -72,7 +71,6 @@ namespace Tower_Defense_Game.GameState
             {
                 _isPaused = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(ContinueLabel)); // ContinueLabel neu melden, da es von IsPaused abhängt
             }
         }
 
@@ -126,6 +124,7 @@ namespace Tower_Defense_Game.GameState
             }
             if (IsEndScreen) // Wenn der EndScreen sichtbar ist und der Continue Button gedrückt wurde
             {
+                Towers.Clear();
                 Enemies.Clear(); // Lösche alle noch Lebenden Enemies damit das Spiel nicht Freezed
                 // RestartWaves(); funktion in WaveManager ausgelöst welcher ein bool zurück gibt.
                 // Der zurück gegebene bool wird zwar nicht wirklich benötigt und war für eine ähnliche interaktion wie StartNextWave geplant
