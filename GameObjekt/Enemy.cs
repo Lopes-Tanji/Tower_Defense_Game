@@ -155,15 +155,15 @@ namespace Tower_Defense_Game.GameObjekt
         }
 
         // Gegner bekommt schaden
-        public void TakeDamage(double damage)
+        public void TakeDamage(double damage) // Funktion wird ausgeführt mit gesendetem Damage-Wert
         {
-            HP -= damage;
+            HP -= damage; // Leben - Schaden
         }
 
-        public void Slow(int zeit)
+        public void Slow(int zeit) // Verlangsamung wird ausgeführt mit mitgesendeter Azahl Sekunden der verlangsamung
         {
-            EffSlowTime = zeit;
-            IsSlowed = true;
+            EffSlowTime = zeit; // Anzahl sekunden der verlangsamung wird im Property gespeichert
+            IsSlowed = true; // Bool für IsSlowed wird auf true gesetzt somit wird der getroffene gegner Verlangsamt
         }
 
         // Dieses Event gehört zum INotifyPropertyChanged-Interface.

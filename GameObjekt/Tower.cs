@@ -208,19 +208,19 @@ namespace Tower_Defense_Game.GameObjekt
             if (_fireCooldown > 0) return; // Noch nicht bereit
             if (target == null) return;
 
-            if(Type == TowerType.DroneOfDownfall) // Wenn der dritte Typ Tower schiesst 
+            if(Type == TowerType.DroneOfDownfall) // Wenn der dritte Typ Tower schiesst dann
             {
-                int randomInstaKill;
-                switch (Level)
+                int randomInstaKill; //int für random.Next() wird erstellt
+                switch (Level) // Je nach dem welches Level der turm hat hat er eine andere chance für den InstaKill
                 {
-                    case 1:
-                        randomInstaKill = random.Next(1, 60);
+                    case 1: // wenn Level 1
+                        randomInstaKill = random.Next(1, 60); // zufällige zahl wird generiert. 1 zu 60 Chance das InstaKill ausgelöst wird
                             break;
-                    case 2:
-                        randomInstaKill = random.Next(1, 40);
+                    case 2: // wenn Level 2
+                        randomInstaKill = random.Next(1, 40); // zufällige zahl wird generiert. 1 zu 40 Chance das InstaKill ausgelöst wird
                         break;
-                    case 3:
-                        randomInstaKill = random.Next(1, 10);
+                    case 3: // wenn Level 3
+                        randomInstaKill = random.Next(1, 10); // zufällige zahl wird generiert. 1 zu 10 Chance das InstaKill ausgelöst wird
                         break;
                     default:
                         randomInstaKill = 0;
