@@ -30,7 +30,7 @@ namespace Tower_Defense_Game.GameLogic
                 new(760, 200),
                 new(450, 200),
                 new(450,  60),
-                new(996,  60)
+                new(820,  60)
             };
 
             // Wir geben einen fertigen Path zurück

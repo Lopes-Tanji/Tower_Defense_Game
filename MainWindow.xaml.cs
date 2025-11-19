@@ -10,6 +10,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Tower_Defense_Game.GameLogic;
 using Tower_Defense_Game.GameState;
+using System.Collections.ObjectModel;
 
 namespace Tower_Defense_Game
 {
@@ -101,6 +102,14 @@ namespace Tower_Defense_Game
 
         private void Continue_Click(object sender, RoutedEventArgs e)
         {
+            if(_gameState.IsEndScreen) // Wenn der endScreen angezeigt wird
+            {
+                foreach (var delTower in _gameState.Towers) // wird jeder Tower in ObservableCollection<Tower> Towers Visuell gelöscht
+                {
+                    TowerDeleter(delTower); // gibt den tower von Tower an die Funktion TowerDeleter weiter und führt sie aus
+                }
+            }
+            // ContinueButton ist unterhalb der Schleife damit die Towers zuerst visuel gelöscht werden können
             (DataContext as GameStateModel)?.ContinueButton();
         }
 
@@ -136,19 +145,30 @@ namespace Tower_Defense_Game
                 _ => 0
             };
 
+            TowerDeleter(tower);
+
+            model.Gold += refund;
+            model.SelectedTower = null;
+        }
+
+        // gleiche Funktioen zum Visuelen löschen der Türme Wie in Delete ausser der ursprung von wo der Tower geholt wird 
+        public void TowerDeleter(Tower delTower) // Funktion zum visuellen löschen des Towers welcher den Tower der klasse Tower benötigt
+        {
             // Aufräumen im Tower (CTS stoppen)
-            try { tower.Dispose(); } catch { }
+            // Es wird versucht auf die Dispose Funktion in Tower zuzugreiffen 
+            try { delTower.Dispose(); } catch { }
 
             // UI-Entfernung auf Dispatcher ausführen (sicher)
             Dispatcher.Invoke(() =>
             {
-                if (GameCanvas.Children.Contains(tower.Container))
-                    GameCanvas.Children.Remove(tower.Container);
+                if (GameCanvas.Children.Contains(delTower.Container))
+                    GameCanvas.Children.Remove(delTower.Container);
             });
 
-            model.Towers.Remove(tower);
-            model.Gold += refund;
-            model.SelectedTower = null;
+            if (_gameState.SelectedTower != null)
+            {
+                _gameState.Towers.Remove(delTower);
+            }
         }
     }
 }

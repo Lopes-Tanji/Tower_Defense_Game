@@ -29,6 +29,7 @@ namespace Tower_Defense_Game.GameObjekt
         public double Width { get; } // Breite des Turms
         public double Height { get; } // Höhe des Turms
         public double Range { get; private set; } // Angriffsreichweite des Turms (Radius)
+        public string Name { get; set; }
         public double FireRate { get; private set; } // Feuerrate
         public int Damage { get; private set; } // Schaden pro Schuss
 
@@ -99,7 +100,8 @@ namespace Tower_Defense_Game.GameObjekt
         {
             Width = width;
             Height = height;
-            Type = type; 
+            Type = type;
+            Name = type.ToString();
 
             Level = 1;
 
