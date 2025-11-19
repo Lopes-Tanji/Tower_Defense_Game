@@ -85,14 +85,13 @@ namespace Tower_Defense_Game.GameState
             set { _isEndScreen = value; OnPropertyChanged(); }
         }
 
-
         private string _continueLabel;
         // Aufschrift des Continue Buttons muss noch verändert werden damit sich das nach start noch verändert mit OnPropertyChanged()
         public string ContinueLabel
         {
             get => _continueLabel;
             set { _continueLabel = value; OnPropertyChanged(); }
-        }     
+        }
 
         // logik hinter dem Continue Button
         public void ContinueButton()
@@ -102,14 +101,8 @@ namespace Tower_Defense_Game.GameState
             if (IsStartScreen)
             {
                 IsStartScreen = false;
+                IsPaused = true;
 
-                // Änderung: starte beim ersten Klick direkt die erste Wave.
-                // Wenn du stattdessen Türme platzieren willst, setze IsPaused = true.
-                var started = _waves.StartNextWave();
-                IsPaused = !started;
-
-                OnPropertyChanged(nameof(CurrentWave));
-                OnPropertyChanged(nameof(WaveRunning));
                 return;
             }
             // Wenn die wave nicht läuft und es keine enemies gibt
@@ -398,7 +391,21 @@ namespace Tower_Defense_Game.GameState
                 {
                     if(tower.Type == Tower.TowerType.DroneOfDemise) // Wenn der aktuelle Tower typ 2 ist
                     {
-                        target.Slow(1); // Wird das getroffene ziel verlangsamt
+                        switch(tower.Level)
+                        {
+                            case 1:
+                                target.Slow(1);
+                                break;
+                            case 2:
+                                target.Slow(2);
+                                break;
+                            case 3:
+                                target.Slow(3);
+                                break;
+                            default:
+                                break;
+                        }
+                         // Wird das getroffene ziel verlangsamt
                     }
                     tower.Shoot(target); // Gegner Schaden zufügen
                 }

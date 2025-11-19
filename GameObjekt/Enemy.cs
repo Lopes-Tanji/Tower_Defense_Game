@@ -90,7 +90,6 @@ namespace Tower_Defense_Game.GameObjekt
         // Methode zum Updaten der Enemy Position
         public void Update(double deltaTickTime)
         {
-            if (IsDead || ReachedEnd) return;
             // Ist der Gegner Tot oder hat das ende erreicht wird abgebrochen
             if(IsDead || ReachedEnd)
             {
@@ -102,11 +101,15 @@ namespace Tower_Defense_Game.GameObjekt
                 if(SlowTimer == 0) // Wenn erster verlangsamter tick ist
                 {
                     Speed /= 2; // Wird die geschwindigkeit durch 2 gerechnet
+                    SlowTimer++;
                 }
+                else
+                {
+                    SlowTimer++; // Frame wird hochgezählt
+                }
+                
 
-                SlowTimer++; // Frame wird hochgezählt
-
-                if(SlowTimer <= 30 * EffSlowTime) // Wenn die Slow zeit erreicht wurde
+                if(SlowTimer >= 30 * EffSlowTime) // Wenn die Slow zeit erreicht wurde
                 {
                     Speed *= 2; // Speed wieder Normal
                     SlowTimer = 0; // SlowTime wird zurückgesetzt
