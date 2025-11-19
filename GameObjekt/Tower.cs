@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -58,17 +59,17 @@ namespace Tower_Defense_Game.GameObjekt
         // NEW: tower images per type & level
         private static readonly Dictionary<TowerType, string[]> TowerImages = new()
         {
-            { TowerType.Type1, new[] { "images/Red1.png", "images/Red2.png", "images/Red3.png" } },
-            { TowerType.Type2, new[] { "images/Green1.png", "images/Green2.png", "images/Green3.png" } },
-            { TowerType.Type3, new[] { "images/Blue1.png", "images/Blue2.png", "images/Blue3.png" } },
+            { TowerType.Type1, new[] { "images/Green1.png", "images/Green2.png", "images/Green3.png" } },
+            { TowerType.Type2, new[] { "images/Blue1.png", "images/Blue2.png", "images/Blue3.png" } },
+            { TowerType.Type3, new[] { "images/Red1.png", "images/Red2.png", "images/Red3.png" }  }, 
         };
 
         // NEW: tower stats per type & level
         private static readonly Dictionary<TowerType, (int damage, double range, double fireRate)[]> TowerStats = new()
         {
-            { TowerType.Type1, new (int, double, double)[] { (20, 100, 1.0), (50, 120, 1.2), (100, 150, 1.5) } },
-            { TowerType.Type2, new (int, double, double)[] { (20, 100, 1.0), (40, 130, 1.0), (100, 200, 2) } },
-            { TowerType.Type3, new (int, double, double)[] { (20, 100, 1.0), (60, 110, 1.1), (120, 140, 1.4) } },
+            { TowerType.Type1, new (int, double, double)[] { (40, 100, 1.0), (90, 120, 1.5), (140, 150, 2) } },
+            { TowerType.Type2, new (int, double, double)[] { (20, 100, 1.0), (70, 130, 1.2), (120, 200, 1.4) } },
+            { TowerType.Type3, new (int, double, double)[] { (20, 100, 1.0), (50, 120, 1.75), (80, 140, 2.5) } },
         };
 
         // image cache to avoid reload problems
@@ -208,7 +209,23 @@ namespace Tower_Defense_Game.GameObjekt
 
             if(Type == TowerType.Type3) // Wenn der dritte Typ Tower schiesst 
             {
-                int randomInstaKill = random.Next(1, 10); // Wird eine random zahl 
+                int randomInstaKill;
+                switch (Level)
+                {
+                    case 1:
+                        randomInstaKill = random.Next(1, 60);
+                            break;
+                    case 2:
+                        randomInstaKill = random.Next(1, 40);
+                        break;
+                    case 3:
+                        randomInstaKill = random.Next(1, 10);
+                        break;
+                    default:
+                        randomInstaKill = 0;
+                        break;
+                }
+                // Wird eine random zahl 
                 if(randomInstaKill == 5) // random zahl im zahlenbereich
                 {
                     target.TakeDamage(Damage * 999); // Damage des Turms mal 999 damit es wie ein instakill ist

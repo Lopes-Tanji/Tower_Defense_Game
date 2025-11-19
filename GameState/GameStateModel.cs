@@ -85,14 +85,13 @@ namespace Tower_Defense_Game.GameState
             set { _isEndScreen = value; OnPropertyChanged(); }
         }
 
-
         private string _continueLabel;
         // Aufschrift des Continue Buttons muss noch verändert werden damit sich das nach start noch verändert mit OnPropertyChanged()
         public string ContinueLabel
         {
             get => _continueLabel;
             set { _continueLabel = value; OnPropertyChanged(); }
-        }     
+        }
 
         // logik hinter dem Continue Button
         public void ContinueButton()
@@ -392,7 +391,21 @@ namespace Tower_Defense_Game.GameState
                 {
                     if(tower.Type == Tower.TowerType.Type2) // Wenn der aktuelle Tower typ 2 ist
                     {
-                        target.Slow(1); // Wird das getroffene ziel verlangsamt
+                        switch(tower.Level)
+                        {
+                            case 1:
+                                target.Slow(1);
+                                break;
+                            case 2:
+                                target.Slow(2);
+                                break;
+                            case 3:
+                                target.Slow(3);
+                                break;
+                            default:
+                                break;
+                        }
+                         // Wird das getroffene ziel verlangsamt
                     }
                     tower.Shoot(target); // Gegner Schaden zufügen
                 }
