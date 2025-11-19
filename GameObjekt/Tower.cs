@@ -211,26 +211,26 @@ namespace Tower_Defense_Game.GameObjekt
             if (_fireCooldown > 0) return; // Noch nicht bereit
             if (target == null) return;
 
-            if(Type == TowerType.DroneOfDownfall) // Wenn der dritte Typ Tower schiesst 
+            if(Type == TowerType.DroneOfDownfall) // Wenn der dritte Typ Tower schiesst dann
             {
-                int randomInstaKill;
-                switch (Level)
+                int randomInstaKill; //int für random.Next() wird erstellt
+                switch (Level) // Je nach dem welches Level der turm hat hat er eine andere chance für den InstaKill
                 {
-                    case 1:
-                        randomInstaKill = random.Next(1, 60);
-                            break;
-                    case 2:
-                        randomInstaKill = random.Next(1, 40);
-                        break;
-                    case 3:
-                        randomInstaKill = random.Next(1, 10);
-                        break;
-                    default:
-                        randomInstaKill = 0;
-                        break;
+                    case 1: // wenn Level 1
+                        randomInstaKill = random.Next(1, 60); // zufällige zahl wird generiert. 1 zu 60 Chance das InstaKill ausgelöst wird
+                            break; //Switsch verlassen
+                    case 2: // wenn Level 2
+                        randomInstaKill = random.Next(1, 40); // zufällige zahl wird generiert. 1 zu 40 Chance das InstaKill ausgelöst wird
+                        break; // Switch verlassen
+                    case 3: // wenn Level 3
+                        randomInstaKill = random.Next(1, 10); // zufällige zahl wird generiert. 1 zu 10 Chance das InstaKill ausgelöst wird
+                        break; // Switch verlassen
+                    default: // fals etwas mit den Level komisch ist
+                        randomInstaKill = 0; // InstaKill zahl ausserhalb der Range
+                        break; // Switch verlassen
                 }
                 // Wird eine random zahl 
-                if(randomInstaKill == 5) // random zahl im zahlenbereich
+                if(randomInstaKill == 5) // random zahl = 5 da 5 in allen Leveln vorhanden ist
                 {
                     target.TakeDamage(Damage * 999); // Damage des Turms mal 999 damit es wie ein instakill ist
                     

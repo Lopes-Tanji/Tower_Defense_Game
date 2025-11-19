@@ -124,10 +124,11 @@ namespace Tower_Defense_Game.GameState
             }
             if (IsEndScreen) // Wenn der EndScreen sichtbar ist und der Continue Button gedrückt wurde
             {
-                Towers.Clear();
+                Towers.Clear(); // ObservableCollection<Tower> Towers wird gecleart (leer)
                 Enemies.Clear(); // Lösche alle noch Lebenden Enemies damit das Spiel nicht Freezed
                 // RestartWaves(); funktion in WaveManager ausgelöst welcher ein bool zurück gibt.
-                // Der zurück gegebene bool wird zwar nicht wirklich benötigt und war für eine ähnliche interaktion wie StartNextWave geplant
+                // Der zurück gegebene bool wird zwar nicht wirklich benötigt und war für eine ähnliche
+                // interaktion wie StartNextWave geplant
                 var started = _waves.RestartWaves(); // Resetet die wave
                 if(started)
                 {
@@ -191,7 +192,8 @@ namespace Tower_Defense_Game.GameState
         //ObservableCollection<Enemy> Enemies war zu beginn List<Enemy> jedoch ist das Spiel gecrasht wenn der Test-Enemy gelöscht wurde.
         public ObservableCollection<Enemy> Enemies { get; } = new();
 
-        public ObservableCollection<Tower> Towers { get; set; } = new ObservableCollection<Tower>(); // Turm-Liste für die UI
+        // Turm-Liste von Turm 
+        public ObservableCollection<Tower> Towers { get; set; } = new ObservableCollection<Tower>();
 
 
         // Speichert, wie viele Sekunden das Spiel bereits gelaufen ist.
@@ -236,7 +238,7 @@ namespace Tower_Defense_Game.GameState
         {
             // 100 Waves werden erstellt die mit jeder Runde immer stärker werden
             for (int i = 1; i <= 101; i++)
-            {
+            {                          //Anzahl       HP              Geschwindigkeit      Interval des Spawnen
                 _waves.AddWave(new Wave(10 * i, 20 * (2 + (i / 10)), 200 * (1 + (i / 10)), 0.5));
             }
         }
@@ -375,30 +377,21 @@ namespace Tower_Defense_Game.GameState
                 }
                        
 
-
-
-            // - Türme updaten
-
-
-
-            // - Projektile updaten
-            // - Kollisions- / Treffer-Checks
-
                 var target = tower.FindTarget(Enemies); // Sucht Gegner im Radius
                 if (target != null)
                 {
                     if(tower.Type == Tower.TowerType.DroneOfDemise) // Wenn der aktuelle Tower typ 2 ist
                     {
-                        switch(tower.Level)
+                        switch(tower.Level) // Je nach dem welches Level der Turm hat ist die Verlangsamungsdauer anders
                         {
-                            case 1:
-                                target.Slow(1);
+                            case 1: // Wenn Level 1
+                                target.Slow(1); // Dann wird für 1 Sekunde Verlangsamt
                                 break;
-                            case 2:
-                                target.Slow(2);
+                            case 2: // Wenn Level 2
+                                target.Slow(2); // Dann wird für 2 Sekunden Verlangsamt
                                 break;
-                            case 3:
-                                target.Slow(3);
+                            case 3: // Wenn Level 3
+                                target.Slow(3); // Dann wird für 3 Sekunden Verlangsamt
                                 break;
                             default:
                                 break;
@@ -410,10 +403,10 @@ namespace Tower_Defense_Game.GameState
                     
             }
 
-            OnPropertyChanged(nameof(WaveRunning));
-            OnPropertyChanged(nameof(CurrentWave));
+            OnPropertyChanged(nameof(WaveRunning)); //UI Update
+            OnPropertyChanged(nameof(CurrentWave)); //UI Update
 
-            
+
         }
 
         // Dieses Event gehört zum INotifyPropertyChanged-Interface.
