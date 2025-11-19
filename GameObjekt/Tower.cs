@@ -17,7 +17,7 @@ namespace Tower_Defense_Game.GameObjekt
 {
     public class Tower : INotifyPropertyChanged
     {
-        public enum TowerType { Type1, Type2, Type3 }
+        public enum TowerType { DroneOfDoom, DroneOfDemise, DroneOfDownfall }
 
         public TowerType Type { get; }
 
@@ -58,17 +58,17 @@ namespace Tower_Defense_Game.GameObjekt
         // NEW: tower images per type & level
         private static readonly Dictionary<TowerType, string[]> TowerImages = new()
         {
-            { TowerType.Type1, new[] { "images/Red1.png", "images/Red2.png", "images/Red3.png" } },
-            { TowerType.Type2, new[] { "images/Green1.png", "images/Green2.png", "images/Green3.png" } },
-            { TowerType.Type3, new[] { "images/Blue1.png", "images/Blue2.png", "images/Blue3.png" } },
+            { TowerType.DroneOfDoom, new[] { "images/Red1.png", "images/Red2.png", "images/Red3.png" } },
+            { TowerType.DroneOfDemise, new[] { "images/Green1.png", "images/Green2.png", "images/Green3.png" } },
+            { TowerType.DroneOfDownfall, new[] { "images/Blue1.png", "images/Blue2.png", "images/Blue3.png" } },
         };
 
         // NEW: tower stats per type & level
         private static readonly Dictionary<TowerType, (int damage, double range, double fireRate)[]> TowerStats = new()
         {
-            { TowerType.Type1, new (int, double, double)[] { (20, 100, 1.0), (30, 150, 2), (1000, 1000, 0.5) } },
-            { TowerType.Type2, new (int, double, double)[] { (20, 100, 1.0), (50, 200, 1.5), (33, 500, 10) } },
-            { TowerType.Type3, new (int, double, double)[] { (20, 100, 1.0), (300, 100, 1), (500, 100, 1.5) } },
+            { TowerType.DroneOfDoom, new (int, double, double)[] { (20, 100, 1.0), (30, 150, 2), (1000, 1000, 0.5) } },
+            { TowerType.DroneOfDemise, new (int, double, double)[] { (20, 100, 1.0), (50, 200, 1.5), (33, 500, 10) } },
+            { TowerType.DroneOfDownfall, new (int, double, double)[] { (20, 100, 1.0), (300, 100, 1), (500, 100, 1.5) } },
         };
 
         // image cache to avoid reload problems
@@ -206,7 +206,7 @@ namespace Tower_Defense_Game.GameObjekt
             if (_fireCooldown > 0) return; // Noch nicht bereit
             if (target == null) return;
 
-            if(Type == TowerType.Type3) // Wenn der dritte Typ Tower schiesst 
+            if(Type == TowerType.DroneOfDownfall) // Wenn der dritte Typ Tower schiesst 
             {
                 int randomInstaKill = random.Next(1, 10); // Wird eine random zahl 
                 if(randomInstaKill == 5) // random zahl im zahlenbereich
@@ -349,6 +349,20 @@ namespace Tower_Defense_Game.GameObjekt
             }
 
             return false;
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                if (_flashCts != null)
+                {
+                    _flashCts.Cancel();
+                    _flashCts.Dispose();
+                    _flashCts = null;
+                }
+            }
+            catch { /* ignore */ }
         }
 
         // Dieses Event gehört zum INotifyPropertyChanged-Interface.

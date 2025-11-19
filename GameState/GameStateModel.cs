@@ -396,7 +396,7 @@ namespace Tower_Defense_Game.GameState
                 var target = tower.FindTarget(Enemies); // Sucht Gegner im Radius
                 if (target != null)
                 {
-                    if(tower.Type == Tower.TowerType.Type2) // Wenn der aktuelle Tower typ 2 ist
+                    if(tower.Type == Tower.TowerType.DroneOfDemise) // Wenn der aktuelle Tower typ 2 ist
                     {
                         target.Slow(1); // Wird das getroffene ziel verlangsamt
                     }
