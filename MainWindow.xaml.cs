@@ -28,7 +28,7 @@ namespace Tower_Defense_Game
             _gameState = new GameStateModel();
             DataContext = _gameState;
             _backgroundMusic = new MediaPlayer();
-            _backgroundMusic.Open(new Uri("images/TDMusic.mp3", UriKind.Relative));
+            _backgroundMusic.Open(new Uri("images/CATHARSISTD.m4a", UriKind.Relative));
             _backgroundMusic.MediaEnded += (s, e) => _backgroundMusic.Position = TimeSpan.Zero;
             _backgroundMusic.Play();
 
