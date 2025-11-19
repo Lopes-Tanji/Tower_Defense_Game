@@ -214,19 +214,19 @@ namespace Tower_Defense_Game.GameObjekt
                 {
                     case 1: // wenn Level 1
                         randomInstaKill = random.Next(1, 60); // zufällige zahl wird generiert. 1 zu 60 Chance das InstaKill ausgelöst wird
-                            break;
+                            break; //Switsch verlassen
                     case 2: // wenn Level 2
                         randomInstaKill = random.Next(1, 40); // zufällige zahl wird generiert. 1 zu 40 Chance das InstaKill ausgelöst wird
-                        break;
+                        break; // Switch verlassen
                     case 3: // wenn Level 3
                         randomInstaKill = random.Next(1, 10); // zufällige zahl wird generiert. 1 zu 10 Chance das InstaKill ausgelöst wird
-                        break;
-                    default:
-                        randomInstaKill = 0;
-                        break;
+                        break; // Switch verlassen
+                    default: // fals etwas mit den Level komisch ist
+                        randomInstaKill = 0; // InstaKill zahl ausserhalb der Range
+                        break; // Switch verlassen
                 }
                 // Wird eine random zahl 
-                if(randomInstaKill == 5) // random zahl im zahlenbereich
+                if(randomInstaKill == 5) // random zahl = 5 da 5 in allen Leveln vorhanden ist
                 {
                     target.TakeDamage(Damage * 999); // Damage des Turms mal 999 damit es wie ein instakill ist
                     

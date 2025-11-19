@@ -191,6 +191,7 @@ namespace Tower_Defense_Game.GameState
         //ObservableCollection<Enemy> Enemies war zu beginn List<Enemy> jedoch ist das Spiel gecrasht wenn der Test-Enemy gelöscht wurde.
         public ObservableCollection<Enemy> Enemies { get; } = new();
 
+        // Turm-Liste von Turm 
         public ObservableCollection<Tower> Towers { get; set; } = new ObservableCollection<Tower>();
 
 
@@ -236,8 +237,8 @@ namespace Tower_Defense_Game.GameState
         {
             // 100 Waves werden erstellt die mit jeder Runde immer stärker werden
             for (int i = 1; i <= 101; i++)
-            {
-                _waves.AddWave(new Wave(10 * i, 20 * (2 + (i / 10)), 200 * (1 + (i / 10)), 0.5));
+            {                          //Anzahl       HP              Geschwindigkeit      Interval des Spawnen
+                _waves.AddWave(new Wave(10 * i, 20 * (2 + (i / 10)), 150 * (1 + (i / 10)), 0.5));
             }
         }
         // Konstruktor
@@ -376,30 +377,21 @@ namespace Tower_Defense_Game.GameState
                 }
                        
 
-
-
-            // - Türme updaten
-
-
-
-            // - Projektile updaten
-            // - Kollisions- / Treffer-Checks
-
                 var target = tower.FindTarget(Enemies); // Sucht Gegner im Radius
                 if (target != null)
                 {
                     if(tower.Type == Tower.TowerType.DroneOfDemise) // Wenn der aktuelle Tower typ 2 ist
                     {
-                        switch(tower.Level)
+                        switch(tower.Level) // Je nach dem welches Level der Turm hat ist die Verlangsamungsdauer anders
                         {
-                            case 1:
-                                target.Slow(1);
+                            case 1: // Wenn Level 1
+                                target.Slow(1); // Dann wird für 1 Sekunde Verlangsamt
                                 break;
-                            case 2:
-                                target.Slow(2);
+                            case 2: // Wenn Level 2
+                                target.Slow(2); // Dann wird für 2 Sekunden Verlangsamt
                                 break;
-                            case 3:
-                                target.Slow(3);
+                            case 3: // Wenn Level 3
+                                target.Slow(3); // Dann wird für 3 Sekunden Verlangsamt
                                 break;
                             default:
                                 break;
@@ -411,10 +403,10 @@ namespace Tower_Defense_Game.GameState
                     
             }
 
-            OnPropertyChanged(nameof(WaveRunning));
-            OnPropertyChanged(nameof(CurrentWave));
+            OnPropertyChanged(nameof(WaveRunning)); //UI Update
+            OnPropertyChanged(nameof(CurrentWave)); //UI Update
 
-            
+
         }
 
         // Dieses Event gehört zum INotifyPropertyChanged-Interface.
