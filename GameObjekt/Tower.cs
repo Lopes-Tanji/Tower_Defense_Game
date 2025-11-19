@@ -59,23 +59,18 @@ namespace Tower_Defense_Game.GameObjekt
         // NEW: tower images per type & level
         private static readonly Dictionary<TowerType, string[]> TowerImages = new()
         {
-            { TowerType.Type1, new[] { "images/Green1.png", "images/Green2.png", "images/Green3.png" } },
-            { TowerType.Type2, new[] { "images/Blue1.png", "images/Blue2.png", "images/Blue3.png" } },
-            { TowerType.Type3, new[] { "images/Red1.png", "images/Red2.png", "images/Red3.png" }  }, 
-            { TowerType.DroneOfDoom, new[] { "images/Red1.png", "images/Red2.png", "images/Red3.png" } },
-            { TowerType.DroneOfDemise, new[] { "images/Green1.png", "images/Green2.png", "images/Green3.png" } },
-            { TowerType.DroneOfDownfall, new[] { "images/Blue1.png", "images/Blue2.png", "images/Blue3.png" } },
+            
+            { TowerType.DroneOfDoom, new[] { "images/Green1.png", "images/Green2.png", "images/Green3.png" } },
+            { TowerType.DroneOfDemise, new[] { "images/Blue1.png", "images/Blue2.png", "images/Blue3.png" } },
+            { TowerType.DroneOfDownfall, new[] { "images/Red1.png", "images/Red2.png", "images/Red3.png" } } 
         };
 
         // NEW: tower stats per type & level
         private static readonly Dictionary<TowerType, (int damage, double range, double fireRate)[]> TowerStats = new()
         {
-            { TowerType.Type1, new (int, double, double)[] { (40, 100, 1.0), (90, 120, 1.5), (140, 150, 2) } },
-            { TowerType.Type2, new (int, double, double)[] { (20, 100, 1.0), (70, 130, 1.2), (120, 200, 1.4) } },
-            { TowerType.Type3, new (int, double, double)[] { (20, 100, 1.0), (50, 120, 1.75), (80, 140, 2.5) } },
-            { TowerType.DroneOfDoom, new (int, double, double)[] { (20, 100, 1.0), (30, 150, 2), (1000, 1000, 0.5) } },
-            { TowerType.DroneOfDemise, new (int, double, double)[] { (20, 100, 1.0), (50, 200, 1.5), (33, 500, 10) } },
-            { TowerType.DroneOfDownfall, new (int, double, double)[] { (20, 100, 1.0), (300, 100, 1), (500, 100, 1.5) } },
+            { TowerType.DroneOfDoom, new (int, double, double)[] { (40, 100, 1.0), (90, 120, 1.5), (140, 150, 2) } },
+            { TowerType.DroneOfDemise, new (int, double, double)[] { (20, 100, 1.0), (70, 130, 1.2), (120, 200, 1.4) } },
+            { TowerType.DroneOfDownfall, new (int, double, double)[] { (20, 100, 1.0), (50, 120, 1.75), (80, 140, 2.5) } },
         };
 
         // image cache to avoid reload problems
