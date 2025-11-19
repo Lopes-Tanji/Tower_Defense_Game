@@ -145,7 +145,7 @@ namespace Tower_Defense_Game
                 _ => 0
             };
 
-            TowerDeleter(tower);
+            TowerDeleter(tower); // gibt den Tower über SelectedTower an die Funktion TowerDeleter weiter und führt sie aus
 
             model.Gold += refund;
             model.SelectedTower = null;
@@ -165,9 +165,11 @@ namespace Tower_Defense_Game
                     GameCanvas.Children.Remove(delTower.Container);
             });
 
-            if (_gameState.SelectedTower != null)
+            // Es wird überprüft ob der selected Tower null ist
+            // Für den restart delete wird das nicht benötigt da es im GameStateModel gelöscht wird wenn die Schleife beendet ist
+            if (_gameState.SelectedTower != null) 
             {
-                _gameState.Towers.Remove(delTower);
+                _gameState.Towers.Remove(delTower); // Tower wird aus ObservableCollection<Tower> Towers gelöscht
             }
         }
     }

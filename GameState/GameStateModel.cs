@@ -124,10 +124,11 @@ namespace Tower_Defense_Game.GameState
             }
             if (IsEndScreen) // Wenn der EndScreen sichtbar ist und der Continue Button gedrückt wurde
             {
-                Towers.Clear();
+                Towers.Clear(); // ObservableCollection<Tower> Towers wird gecleart (leer)
                 Enemies.Clear(); // Lösche alle noch Lebenden Enemies damit das Spiel nicht Freezed
                 // RestartWaves(); funktion in WaveManager ausgelöst welcher ein bool zurück gibt.
-                // Der zurück gegebene bool wird zwar nicht wirklich benötigt und war für eine ähnliche interaktion wie StartNextWave geplant
+                // Der zurück gegebene bool wird zwar nicht wirklich benötigt und war für eine ähnliche
+                // interaktion wie StartNextWave geplant
                 var started = _waves.RestartWaves(); // Resetet die wave
                 if(started)
                 {
@@ -238,7 +239,7 @@ namespace Tower_Defense_Game.GameState
             // 100 Waves werden erstellt die mit jeder Runde immer stärker werden
             for (int i = 1; i <= 101; i++)
             {                          //Anzahl       HP              Geschwindigkeit      Interval des Spawnen
-                _waves.AddWave(new Wave(10 * i, 20 * (2 + (i / 10)), 150 * (1 + (i / 10)), 0.5));
+                _waves.AddWave(new Wave(10 * i, 20 * (2 + (i / 10)), 200 * (1 + (i / 10)), 0.5));
             }
         }
         // Konstruktor
