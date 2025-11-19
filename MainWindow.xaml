@@ -17,6 +17,7 @@
 
         <!-- Spielfeld -->
         <Canvas x:Name="GameCanvas" Margin="12">
+            <!--Gradient als Hintergrund mit 3 Blau-Sorten-->
             <Canvas.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                     <GradientStop Color="#E6FBFF" Offset="0.0"/>
@@ -68,6 +69,7 @@
 
                 <ItemsControl.ItemContainerStyle>
                     <Style TargetType="ContentPresenter">
+                        <!--Position import per Binding von der X und Y position-->
                         <Setter Property="Canvas.Left" Value="{Binding E_x_pos}" />
                         <Setter Property="Canvas.Top" Value="{Binding E_y_pos}" />
                     </Style>
@@ -75,10 +77,12 @@
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
+                        <!--Bild import per Source implementation + grösse Anpassung-->
                         <Image Width="48" Height="48" Margin="-24"
            Source="pack://application:,,,/images/Enemy.png"
            RenderTransformOrigin="0.5,0.5">
                             <Image.RenderTransform>
+                                <!--Rotationsaufruf damit dies Visuell ersichtlich ist-->
                                 <RotateTransform Angle="{Binding Rotation}" />
                             </Image.RenderTransform>
                         </Image>
@@ -118,7 +122,7 @@
 
             <Separator Margin="0,12,0,12"/>
 
-            <TextBlock Text="Türme:" Foreground="LightGray" Margin="0,0,0,4"/>
+            <TextBlock Text="Türme zur Auswahl:" Foreground="LightGray" Margin="0,0,0,4"/>
 
             <!-- Drei Buttons für Türme -->
             <Button Content="Drone of Doom (50 Gold)" Click="SpawnTower1_Click" Margin="0,2,0,2"/>
@@ -132,14 +136,16 @@
             Foreground="Black"
             FontWeight="Bold"/>
             <Separator Margin="0,6,0,6"/>
+            <!--Upgrade Button-->
             <Button x:Name="UpgradeButton" Content="Upgrade (Level 2: 5k Gold, Level 3: 50k Gold" Click="UpgradeButton_Click"/>
             <Separator Margin="0,6,0,6"/>
+            <!--Delete Button-->
             <Button Content="Delete"
         Click="DeleteTower_Click"
         Background="IndianRed"
         Foreground="White"/>
             <Separator Margin="0,6,0,6"/>
-
+            <!--Auflistung der auf dem Spielfeld platzierten Türme in einer Listbox-->
             <ListBox x:Name="TowerList"
          Grid.Row="1"
          ItemsSource="{Binding Towers}"

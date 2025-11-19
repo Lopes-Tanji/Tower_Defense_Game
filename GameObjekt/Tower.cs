@@ -29,7 +29,7 @@ namespace Tower_Defense_Game.GameObjekt
         public double Width { get; } // Breite des Turms
         public double Height { get; } // Höhe des Turms
         public double Range { get; private set; } // Angriffsreichweite des Turms (Radius)
-        public string Name { get; set; }
+        public string Name { get; set; } // Name des Turms für die UI
         public double FireRate { get; private set; } // Feuerrate
         public int Damage { get; private set; } // Schaden pro Schuss
 
@@ -55,7 +55,7 @@ namespace Tower_Defense_Game.GameObjekt
         public ImageSource OriginalSource { get; private set; } // Originalbild des Turms
         public ImageSource FlashSource { get; private set; } // Bild für Flash-Effekt
 
-        // Turm -Bilder pro Typ & Level
+        // Liste der Bildpfade pro Turmtyp und Level
         private static readonly Dictionary<TowerType, string[]> TowerImages = new()
         {
             
@@ -64,7 +64,7 @@ namespace Tower_Defense_Game.GameObjekt
             { TowerType.DroneOfDownfall, new[] { "images/Red1.png", "images/Red2.png", "images/Red3.png" } } 
         };
 
-        // NEW: tower stats per type & level
+        // Liste der Stats pro Turmtyp und Level
         private static readonly Dictionary<TowerType, (int damage, double range, double fireRate)[]> TowerStats = new()
         {
             { TowerType.DroneOfDoom, new (int, double, double)[] { (40, 100, 1.0), (90, 120, 1.5), (140, 150, 2) } },
@@ -72,8 +72,10 @@ namespace Tower_Defense_Game.GameObjekt
             { TowerType.DroneOfDownfall, new (int, double, double)[] { (20, 100, 1.0), (50, 120, 1.75), (80, 140, 2.5) } },
         };
 
-        // image cache to avoid reload problems
+        // Bild-Cache für geladene BitmapImages
         private static readonly Dictionary<string, BitmapImage> _imageCache = new();
+
+        // Lädt ein BitmapImage aus dem angegebenen relativen Pfad (Resource-Pfad)
 
         private static BitmapImage LoadBitmap(string relativePath)
         {
@@ -96,60 +98,62 @@ namespace Tower_Defense_Game.GameObjekt
         // Random zahl für istakill chance
         Random random = new Random();
 
+
+        // Konstruktor für den Turm auf dem Canvas
         public Tower(double width, double height, TowerType type)
         {
-            Width = width;
-            Height = height;
-            Type = type;
-            Name = type.ToString();
+            Width = width; // Setze Breite
+            Height = height; // Setze Höhe
+            Type = type; // Setze Turmtyp
+            Name = type.ToString(); // Setze Name basierend auf Turmtyp
 
-            Level = 1;
+            Level = 1; // Startlevel ist 1
 
-            // Set initial stats
+            // Setze Anfangsstats basierend auf Turmtyp und Level
             (Damage, Range, FireRate) = TowerStats[type][0];
 
-            _fireCooldown = 0;
-            IsPlaced = false;
+            _fireCooldown = 0; // Timer default auf 0
+            IsPlaced = false; // Turm ist anfangs nicht platziert
 
-            var initialSource = LoadBitmap(TowerImages[type][0]);
+            var initialSource = LoadBitmap(TowerImages[type][0]); // Lade Anfangsbild
 
-            Sprite = new Image
+            Sprite = new Image // Image-Element für den Turm
             {
-                Width = width,
+                Width = width, 
                 Height = height,
                 Source = initialSource
             };
 
-            // store references
-            OriginalSource = initialSource;
+            // speichere Original- und Flash-Bilder
+            OriginalSource = initialSource; // ursprüngliches Bild
             FlashSource = null; // kein Flash-Bild standardmäßig — verwenden wir stattdessen eine kurze Scale-Animation
 
             // Kombiniere Rotate + Scale als RenderTransform (Scale für Flash-Effekt)
-            var tg = new TransformGroup();
-            tg.Children.Add(_rotateTransform);
-            tg.Children.Add(_flashScaleTransform);
-            Sprite.RenderTransform = tg;
-            Sprite.RenderTransformOrigin = new Point(0.5, 0.5);
+            var tg = new TransformGroup(); // TransformGroup für mehrere Transformationen
+            tg.Children.Add(_rotateTransform); // Rotation
+            tg.Children.Add(_flashScaleTransform); // Scale für Flash-Effekt
+            Sprite.RenderTransform = tg; // Setze RenderTransform
+            Sprite.RenderTransformOrigin = new Point(0.5, 0.5); // Transformationsursprung in der Mitte
 
-            Container = new Border
+            Container = new Border // Border um den Turm für Hervorhebung
             {
-                Width = width,
-                Height = height,
-                BorderThickness = new Thickness(0),   // hidden default
-                BorderBrush = Brushes.Yellow,         // highlight color
-                Child = Sprite                         // IMPORTANT: sprite inside border
+                Width = width, // Setze Breite
+                Height = height, // Setze Höhe
+                BorderThickness = new Thickness(0),   // versteckt standardmäßig
+                BorderBrush = Brushes.Yellow,         // gelbe Hervorhebung
+                Child = Sprite                         // Sprite/Bild im Container
             };
         }
 
-        // NEW: Upgrade ersetzt Bild vollständig, bricht laufende Flash-Effekte
+        // Upgrade-Methode für den Turm
         public bool Upgrade()
         {
-            if (Level >= 3) return false; // already max level
+            if (Level >= 3) return false; // Max Level erreicht
 
-            Level++;
-            (Damage, Range, FireRate) = TowerStats[Type][Level - 1];
+            Level++; // Level erhöhen
+            (Damage, Range, FireRate) = TowerStats[Type][Level - 1]; // Neue Stats setzen
 
-            // cancel running flash (falls vorhanden)
+            // Lösche und storniere vorherigen Flash-Effekt, falls aktiv
             if (_flashCts != null)
             {
                 try { _flashCts.Cancel(); } catch { }
@@ -157,46 +161,46 @@ namespace Tower_Defense_Game.GameObjekt
                 _flashCts = null;
             }
 
-            // load cached, frozen bitmap (robust)
+            // Lade neues Bild für das aktuelle Level
             var newSource = LoadBitmap(TowerImages[Type][Level - 1]);
 
-            // set the image source used in the canvas — vollständiger Ersatz
+            // Aktualisiere das Sprite-Bild
             Sprite.Source = newSource;
 
-            // update stored original source and notify bindings
+            // Aktualisiere das OriginalSource-Bild
             OriginalSource = newSource;
 
-            // reset any visual flash transform
+            // Setze Scale-Transform zurück
             _flashScaleTransform.ScaleX = 1;
             _flashScaleTransform.ScaleY = 1;
 
-            // Decide: keep FlashSource null (use animation) or set to a dedicated flash image if available
+            // Kein Flash-Bild für Upgrades
             FlashSource = null;
 
-            // Ensure UI bindings are informed
+            // Benachrichtige UI über Änderungen
             OnPropertyChanged(nameof(Sprite));
             OnPropertyChanged(nameof(OriginalSource));
 
-            return true; // success
+            return true; // erfolgreich
         }
 
-        public void Highlight() => Container.BorderThickness = new Thickness(1);
-        public void ResetHighlight() => Container.BorderThickness = new Thickness(0);
+        public void Highlight() => Container.BorderThickness = new Thickness(1); // Hervorhebung aktivieren
+        public void ResetHighlight() => Container.BorderThickness = new Thickness(0); // Hervorhebung deaktivieren
 
-        public void Update(double deltaTime)
+        public void Update(double deltaTime) // Update-Methode für den Turm
         {
-            if (!IsPlaced) return;
-            _fireCooldown -= deltaTime;
+            if (!IsPlaced) return; // Nur aktualisieren, wenn platziert
+            _fireCooldown -= deltaTime; // Feuercooldown verringern
         }
 
-        public Enemy FindTarget(IEnumerable<Enemy> enemies)
+        public Enemy FindTarget(IEnumerable<Enemy> enemies) // Zielsuche-Methode
         {
-            if (!IsPlaced) return null;
+            if (!IsPlaced) return null; // Nur suchen, wenn platziert
 
-            return enemies
-                .Where(e => DistanceTo(e) <= Range)
-                .OrderByDescending(e => e.GetProgress())
-                .FirstOrDefault();
+            return enemies // Ziel finden
+                .Where(e => DistanceTo(e) <= Range) // Innerhalb der Reichweite
+                .OrderByDescending(e => e.GetProgress()) // Priorisiere nach Fortschritt auf dem Pfad
+                .FirstOrDefault(); // Nimm das erste Ziel
         }
 
         // Shoot: robust against stacked flashes.
@@ -243,77 +247,77 @@ namespace Tower_Defense_Game.GameObjekt
             
             _fireCooldown = 1.0 / FireRate; // Timer zurücksetzen
 
-            // Cancel and dispose previous CTS
+            // Flash-Effekt starten
             if (_flashCts != null)
             {
-                try { _flashCts.Cancel(); } catch { }
+                try { _flashCts.Cancel(); } catch { } // vorherigen Flash abbrechen
                 _flashCts.Dispose();
-                _flashCts = null;
+                _flashCts = null;  // säubern
             }
 
-            _flashCts = new CancellationTokenSource();
-            var token = _flashCts.Token;
+            _flashCts = new CancellationTokenSource(); // neue CancellationTokenSource
+            var token = _flashCts.Token; // token für die Methode
 
-            if (FlashSource != null)
+            if (FlashSource != null) // wenn ein Flash-Bild definiert ist
             {
                 // Bildwechsel-Flash (nur, wenn explizites FlashSource gesetzt)
                 var currentOriginal = OriginalSource; // nicht das beim Aufruf gecapturete alte Bild
-                Sprite.Source = FlashSource;
+                Sprite.Source = FlashSource; // setze auf Flash-Bild
 
-                try
+                try // kurze Wartezeit
                 {
-                    await Task.Delay(100, token);
+                    await Task.Delay(100, token); // 100ms warten
                 }
-                catch (TaskCanceledException)
+                catch (TaskCanceledException) // falls abgebrochen
                 {
-                    return;
+                    return; // einfach zurückkehren
                 }
 
-                if (token.IsCancellationRequested) return;
+                if (token.IsCancellationRequested) return; // Abbruch prüfen
 
                 // Setze immer auf das aktuell gültige OriginalSource zurück
-                Sprite.Source = currentOriginal;
+                Sprite.Source = currentOriginal; // zurück zum Original-Bild
             }
-            else
+            else // kein Flash-Bild definiert
             {
                 // Visueller Effekt: kurze Scale-Animation (kein Bildtausch -> kein "Stacking" alter Bilder)
                 // Animation auf UI-Thread starten
-                var dur = TimeSpan.FromMilliseconds(120);
-                var anim = new DoubleAnimation(1.15, dur) { AutoReverse = true, EasingFunction = new QuadraticEase() };
+                var dur = TimeSpan.FromMilliseconds(120); // Dauer der Animation
+                var anim = new DoubleAnimation(1.15, dur) { AutoReverse = true, EasingFunction = new QuadraticEase() }; // Animation definieren
 
                 // Start animation
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    _flashScaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, anim);
-                    _flashScaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, anim);
+                    _flashScaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, anim); // X skalieren
+                    _flashScaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, anim); // Y skalieren
                 });
 
-                try
+                try // warten bis die Animation fertig ist
                 {
                     await Task.Delay(dur + dur, token); // warten bis anim fertig (hin+zurück)
                 }
-                catch (TaskCanceledException)
+                catch (TaskCanceledException) // falls abgebrochen
                 {
                     // abbrechen: Animation entfernen und reset
-                    Application.Current.Dispatcher.Invoke(() =>
+                    Application.Current.Dispatcher.Invoke(() => // auf UI-Thread
                     {
-                        _flashScaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, null);
-                        _flashScaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, null);
-                        _flashScaleTransform.ScaleX = 1;
-                        _flashScaleTransform.ScaleY = 1;
+                        _flashScaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, null); // Animation abbrechen für X
+                        _flashScaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, null); // Animation abbrechen für Y
+                        _flashScaleTransform.ScaleX = 1; // reset X
+                        _flashScaleTransform.ScaleY = 1; // reset Y
                     });
-                    return;
+                    return; // zurückkehren
                 }
 
-                if (token.IsCancellationRequested) return;
+                if (token.IsCancellationRequested) return; // Abbruch prüfen
 
                 // sicherstellen, dass Scale auf 1 zurückgesetzt ist
-                Application.Current.Dispatcher.Invoke(() =>
+                Application.Current.Dispatcher.Invoke(() => // auf UI-Thread
                 {
-                    _flashScaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, null);
-                    _flashScaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, null);
-                    _flashScaleTransform.ScaleX = 1;
-                    _flashScaleTransform.ScaleY = 1;
+                    _flashScaleTransform.BeginAnimation(ScaleTransform.ScaleXProperty, null); // Animation abbrechen für X
+                    _flashScaleTransform.BeginAnimation(ScaleTransform.ScaleYProperty, null); // Animation abbrechen für Y
+                    _flashScaleTransform.ScaleX = 1; // reset X
+                    _flashScaleTransform.ScaleY = 1; // reset Y
                 });
             }
 
@@ -322,64 +326,64 @@ namespace Tower_Defense_Game.GameObjekt
             _flashCts = null;
         }
 
-        public double DistanceTo(Enemy enemy)
+        public double DistanceTo(Enemy enemy) // Berechnet die Entfernung zu einem Gegner
         {
-            double dx = (CurrentX + Width / 2) - enemy.E_x_pos;
-            double dy = (CurrentY + Height / 2) - enemy.E_y_pos;
-            return Math.Sqrt(dx * dx + dy * dy);
+            double dx = (CurrentX + Width / 2) - enemy.E_x_pos; // Mittelpunkt des Turms in X-Richtung
+            double dy = (CurrentY + Height / 2) - enemy.E_y_pos; // Mittelpunkt des Turms in Y-Richtung
+            return Math.Sqrt(dx * dx + dy * dy); // euklidische Distanz
         }
 
-        public void UpdatePosition()
+        public void UpdatePosition() // Aktualisiert die Position des Turms auf dem Canvas
         {
-            Canvas.SetLeft(Container, CurrentX);
-            Canvas.SetTop(Container, CurrentY);
+            Canvas.SetLeft(Container, CurrentX); // Setze linke Position
+            Canvas.SetTop(Container, CurrentY); // Setze obere Position
         }
 
-        public void RotateTowards(Enemy target)
+        public void RotateTowards(Enemy target) // Dreht den Turm in Richtung des Ziels
         {
-            if (target == null) return;
+            if (target == null) return; // Kein Ziel
 
-            double dx = target.E_x_pos - (CurrentX + Width / 2);
-            double dy = target.E_y_pos - (CurrentY + Height / 2);
+            double dx = target.E_x_pos - (CurrentX + Width / 2); // Differenz in X-Richtung
+            double dy = target.E_y_pos - (CurrentY + Height / 2); // Differenz in Y-Richtung
 
-            double angle = Math.Atan2(dy, dx) * 180 / Math.PI;
-            angle += 90; // adjust for north-facing sprite
-            _rotateTransform.Angle = angle;
+            double angle = Math.Atan2(dy, dx) * 180 / Math.PI; // Winkel in Grad
+            angle += 90; // Anpassung, da das Bild nach oben zeigt
+            _rotateTransform.Angle = angle; // Setze Winkel
         }
 
-        public bool CheckCollision(IEnumerable<Tower> otherTowers, List<Point> pathPoints)
+        public bool CheckCollision(IEnumerable<Tower> otherTowers, List<Point> pathPoints) // Kollisionserkennung
         {
-            Rect myRect = new Rect(CurrentX, CurrentY, Width, Height);
+            Rect myRect = new Rect(CurrentX, CurrentY, Width, Height); // Rechteck des aktuellen Turms (BoxCollider)
 
-            foreach (var tower in otherTowers)
+            foreach (var tower in otherTowers) // Überprüfe Kollision mit anderen Türmen
             {
-                if (tower == this) continue;
-                Rect tRect = new Rect(tower.CurrentX, tower.CurrentY, tower.Width, tower.Height);
-                if (myRect.IntersectsWith(tRect)) return true;
+                if (tower == this) continue; // Überspringe sich selbst
+                Rect tRect = new Rect(tower.CurrentX, tower.CurrentY, tower.Width, tower.Height); // Rechteck des anderen Turms
+                if (myRect.IntersectsWith(tRect)) return true; // Kollision erkannt
             }
 
-            double padding = 10;
-            foreach (var pt in pathPoints)
+            double padding = 10; // Padding um den Pfad für Kollisionserkennung
+            foreach (var pt in pathPoints) // Überprüfe Kollision mit Pfadpunkten
             {
-                Rect pathRect = new Rect(pt.X - padding, pt.Y - padding, padding * 2, padding * 2);
-                if (myRect.IntersectsWith(pathRect)) return true;
+                Rect pathRect = new Rect(pt.X - padding, pt.Y - padding, padding * 2, padding * 2); // Rechteck um Pfadpunkt
+                if (myRect.IntersectsWith(pathRect)) return true; // Kollision erkannt
             }
 
-            return false;
+            return false; // Keine Kollision
         }
 
-        public void Dispose()
+        public void Dispose() // Aufräummethode für den Turm
         {
-            try
+            try // versuche den Flash-Effekt zu stoppen
             {
-                if (_flashCts != null)
+                if (_flashCts != null) // wenn aktiv
                 {
-                    _flashCts.Cancel();
-                    _flashCts.Dispose();
-                    _flashCts = null;
+                    _flashCts.Cancel(); // abbrechen
+                    _flashCts.Dispose(); // Ressourcen freigeben
+                    _flashCts = null; // säubern
                 }
             }
-            catch { /* ignore */ }
+            catch { /* ignore */ } // Fehler ignorieren
         }
 
         // Dieses Event gehört zum INotifyPropertyChanged-Interface.
